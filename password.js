@@ -8,6 +8,6 @@ function promptForPassword(redirect) {
 function checkPassword(guess) {
   if (guess !== insecurePassword) {
     alert('Incorrect password.');
-    history.go(-1);
+    window.location.replace("http://ccl.northwestern.edu/netlogo")
   }
 }
