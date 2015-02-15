@@ -8,9 +8,6 @@
 
 		<link type="text/css" rel="stylesheet" media="all" href="iabm.css"/>
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-		<style type="text/css">
-	
-		</style>
 
 
 <script src='password.js'></script>
@@ -20,12 +17,15 @@
 
 	</head>
 	<body>
-		<img src="images/iabm-cover-title.jpg" alt="Introduction to Agent-based Modeling" style="width:100%; margin-top: -33px;">
+		<a href="index.html">
+			<img src="images/flock.jpg" style="float:right; z-index:5;position:absolute;top:8px;right:8px; width:286px;" />
+			<img src="images/iabm-cover-title.jpg" alt="Introduction to Agent-based Modeling" style="width:100%;">
+		</a>
 
 	<nav>
 	  <ul>
 	    <li>
-	      <a href="#"  onclick='$("#content").load("home.html");'>Home</a>
+	      <a href="#" onclick='$("#content").load("home.html");'>Home</a>
 	    </li>
 	    <li>
 	      <a href="#" onclick='$("#content").load("authors.html");'>Authors</a>
@@ -34,7 +34,7 @@
 	      <a href="#">Resources</a>
       </li>
 	    <li>
-	      <a href="#">NetLogo</a>
+	      <a href="#" onclick='$("#content").load("models.html");'>NetLogo Models</a>
 	    </li>
 	    <li>
 	      <a href="#">Contact</a>
@@ -59,7 +59,7 @@
 						<br/>
 						<div style="padding-left:13%;margin-top:19px;width:28%">
 							<center>
-								Available from the MIT Press:<br/>
+								Available from:<br/>
 								<a href="http://mitpress.mit.edu/books/introduction-agent-based-modeling" target="_blank"><img src="images/mit_press.png" style="height:88px;"/></a>
 								<br/>
 								Also available on <a href="http://amzn.com/0262731894" target="_blank">Amazon
@@ -86,7 +86,7 @@
 		      <a href="#">Resources</a>
 	      </li>
 		    <li>
-		      <a href="#">NetLogo</a>
+		      <a href="#" onclick='$("#content").load("models.html");'>NetLogo Models</a>
 		    </li>
 		    <li>
 		      <a href="#">Contact</a>

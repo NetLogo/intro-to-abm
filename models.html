@@ -1,0 +1,87 @@
+<div>
+
+	<style type="text/css">
+		#models-nav {
+	    width: 101px;
+	    margin-top: 22px;
+	    padding-left: 161px;
+		}
+		#models-nav ul {
+	    margin: 0px;
+	    padding: 0px;
+		}
+		ul.top-level { background: #666; }
+			
+		#models-nav li { list-style: none; }
+    ul.top-level li {
+      border-bottom: #fff solid;
+      border-top: #fff solid;
+      border-width: 1px;
+    }
+		#models-nav div {
+			color: #fff;
+			cursor: pointer;
+			display:block;
+			line-height: 25px;
+			text-indent: 10px;					
+			text-decoration:none;
+			width:100%;
+			padding:6px;
+			font-size: 16px;
+		}
+		#models-nav div:hover{ text-decoration:none;	}
+        #models-nav li:hover {
+          background: #f90;
+          position: relative;
+        }
+      ul.sub-level { display: none; }
+      li:hover .sub-level {
+        background: #999;
+        border: #fff solid;
+        border-width: 1px;
+        display: block;
+        position: absolute;
+        left: 94px;
+        top: 5px;
+      }
+      ul.sub-level li {
+				border: none;
+				float:left;
+				width:200px; 
+      }
+			#models-nav .sub-level { background: #999; }
+							
+		/*IE RESET HELPER*/
+		li:hover .sub-level .sub-level { display:none; }
+		.sub-level li:hover .sub-level { display:block; }	
+	</style>
+
+	<div>
+		<div id="model-content" style="float:right;width:77%;padding-top:22px;">
+			Select a Model
+		</div>
+		<div id="models-nav">
+			NetLogo Models
+	    <ul class="top-level">
+	      <li><div>Chapter 0</div>
+	        <ul class="sub-level">
+	          <li> <div onclick='$("#model-content").load("models/turtlesCircling.html");'>Turtles Circling</div> </li>
+	        </ul>
+	      </li>
+	      <li><div>Chapter 1</div>
+	        <ul class="sub-level">
+	          <li> <div>Model 1.1 Hello 1.1</div> </li>
+	          <li> <div>Model 1.2 Hello 1.2</div> </li>
+	        </ul>
+	      </li>
+	      <li><div>Chapter 2</div></li>
+	      <li><div>Chapter 3</div></li>
+	      <li><div>Chapter 4</div></li>
+	      <li><div>Chapter 5</div></li>
+	      <li><div>Chapter 6</div></li>
+	      <li><div>Chapter 7</div></li>
+	      <li><div>Chapter 8</div></li>
+	    </ul>
+		</div>
+
+	</div>
