@@ -1,6 +1,83 @@
 <div>
 
-</div>
+	<style type="text/css">
+		#models-nav {
+	    width: 171px;
+	    margin-top: 22px;
+	    padding-left: 161px;
+		}
+		#models-nav ul {
+	    margin: 0px;
+	    padding: 0px;
+		}
+		ul.top-level { background: #666; }
+			
+		#models-nav li { list-style: none; }
+    ul.top-level li {
+      border-bottom: #fff solid;
+      border-top: #fff solid;
+      border-width: 1px;
+    }
+		#models-nav div {
+			color: #fff;
+			cursor: pointer;
+			display:block;
+			line-height: 25px;
+			text-indent: 10px;					
+			text-decoration:none;
+			width:100%;
+			padding:6px;
+			font-size: 16px;
+		}
+		#models-nav div:hover{ text-decoration:none;	}
+        #models-nav li:hover {
+          background: #f90;
+          position: relative;
+        }
+      ul.sub-level { display: none; }
+      li:hover .sub-level {
+        background: #999;
+        border: #fff solid;
+        border-width: 1px;
+        display: block;
+        position: absolute;
+        left: 94px;
+        top: 5px;
+      }
+      ul.sub-level li {
+				border: none;
+				float:left;
+				width:200px; 
+      }
+			#models-nav .sub-level { background: #999; }
+							
+		/*IE RESET HELPER*/
+		li:hover .sub-level .sub-level { display:none; }
+		.sub-level li:hover .sub-level { display:block; }	
+	</style>
+
+	<div>
+		<div id="resource-content" style="float:right;width:72%;padding-top:22px;">
+			select desired resource
+		</div>
+		<div id="models-nav">
+			NetLogo Models
+	    <ul class="top-level">
+	      <li><div onclick='$("#resource-content").load("netLogoResources.html");'>NetLogo Resources</div></li>
+	      <li><div>Further Reading</div>
+	      <!--   <ul class="sub-level">
+	          <li> <div>Model 1.1 Hello 1.1</div> </li>
+	          <li> <div>Model 1.2 Hello 1.2</div> </li>
+	         </ul>-->
+	      </li>
+	      <li><div>ABM Books</div></li>
+	      <li><div>ABM Papers</div></li>
+	      <li><div>ABM Resrouces</div></li>
+	      <li><div onclick='$("#resource-content").load("resources/errata.html");console.log("hey");'>Errata</div></li>
+	    </ul>
+		</div>
+
+	</div>
 
 <div>	
 	<div style="float:right; width:43%; padding-right:13%">
@@ -18,30 +95,8 @@
 		GitHub
 
 
-		<h1> Errata </h1>
-		<h2>Chapter 5</h2>
-
-		On page 218, the text below appears:<br/>
-		This can be confusing when first thinking about agentsets, but really, this is a variant of the same issue you run into whenever you take action based on the condition of a variable and that action affects the value of the same variable.
-		<br/><br/>
-		Below is the corrected text:<br/>
-		This can be confusing when first thinking about agentsets, but really, this is a variant of the same issue you run into whenever you condition action based on the value of a variable and that action affects the value of the same variable.
+		
 	</div>
 
-	<div>
-		<img src="images/iabm-cover.jpg" alt="Introduction to Agent-based Modeling" style="width:28%; padding-left:13%;margin-top:19px;">
-		<br/>
-		<div style="padding-left:13%;margin-top:19px;width:28%">
-			<center>
-				Available from:<br/>
-				<a href="http://mitpress.mit.edu/books/introduction-agent-based-modeling" target="_blank"><img src="images/mit_press.png" style="height:88px;"/></a>
-				<br/>
-				Also available on <a href="http://amzn.com/0262731894" target="_blank">Amazon
-				<br/><br/>
-				ISBN: 9780262731898<br/> 
-				496 pp. | 8 x 9 in 
-			</center>
-			<br/>
-		</div>
-	</div>
+	
 </div>

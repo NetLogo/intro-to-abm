@@ -1,150 +1,165 @@
+patches-own [
+  pheromone             ;; amount of pheromone on this patch
+  food                 ;; amount of food on this patch (0, 1, or 2)
+  nest?                ;; true on nest patches, false elsewhere
+]
+
+turtles-own [
+  carrying-food?
+]
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Setup procedures ;;;
+;;;;;;;;;;;;;;;;;;;;;;;;
+
 to setup
-  setup-circle radius number
-  setup-plots
+  clear-all
+  set-default-shape turtles "bug"
+  create-turtles population
+  [ set size 2         ;; easier to see
+    set carrying-food? false ]
+  setup-patches
+  reset-ticks
 end
 
-to setup-circle [r n]
-  clear-all
-  set-default-shape turtles "circle"
-  ;; turtles should be evenly spaced around the circle
-  create-ordered-turtles n [
-    set size 2  ;; easier to see
-    fd r
-    rt 90
+to setup-patches
+  ask patches
+  [ setup-nest
+    setup-food
+    recolor-patch ]
+end
+
+to setup-nest  ;; patch procedure
+  ;; set nest? variable to true inside the nest, false elsewhere
+  set nest? (distancexy 0 0) < 5
+end
+
+to setup-food  ;; patch procedure
+  ;; setup food source one on the right
+  if (distancexy (0.6 * max-pxcor) 0) < 5
+  [ set food 2 ]
+  ;; setup food source two on the lower-left
+  if (distancexy (-0.6 * max-pxcor) (-0.6 * max-pycor)) < 5
+  [ set food 2 ]
+  ;; setup food source three on the upper-left
+  if (distancexy (-0.8 * max-pxcor) (0.8 * max-pycor)) < 5
+  [ set food 2 ]
+end
+
+to recolor-patch  ;; patch procedure
+  ;; scale color to show pheromone concentration
+  set pcolor scale-color green pheromone 0.1 5
+  ;; give color to nest and food sources
+  if nest? [ set pcolor violet ]
+  if food > 0 [ set pcolor cyan ]
+end
+
+;;;;;;;;;;;;;;;;;;;;;
+;;; Go procedures ;;;
+;;;;;;;;;;;;;;;;;;;;;
+
+to go  ;; forever button
+  ask turtles [ move recolor ]
+  diffuse pheromone (diffusion-rate / 100)
+  ask patches
+  [ set pheromone pheromone * (100 - evaporation-rate) / 100  ;; slowly evaporate pheromone
+    if pheromone < 0.05 [ set pheromone 0 ]
+    recolor-patch ]
+  tick
+end
+
+to move  ;; turtle procedure
+  if not carrying-food?  [ look-for-food  ]     ;; if not carrying food, look for it
+  if carrying-food? [ move-towards-nest ]   ;; if carrying food head back to the nest
+  wander          ;; turn a small random amount and move forward
+end
+
+
+to move-towards-nest  ;; turtle procedure
+  ifelse nest?
+  [ ;; drop food and head out again
+    set carrying-food? false
+    rt 180 ]
+  [ set pheromone pheromone + 60  ;; drop some pheromone
+    ;; turn towards the nest, which is at the center
+    facexy 0 0 ]
+end
+
+to look-for-food  ;; turtle procedure
+  ifelse  food > 0
+  [ set carrying-food? true  ;; pick up food
+    set food food - 1        ;; and reduce the food source
+    rt 180                   ;; and turn around
+    stop ]
+  [ ;; go in the direction where the pheromone smell is strongest
+    uphill-pheromone ]
+end
+
+;; sniff left and right, and go where the strongest smell is
+to uphill-pheromone  ;; turtle procedure
+  ;; only turn if the current patch doesn't have much pheromone
+  if pheromone < 2 [
+    let scent-ahead pheromone-scent-at-angle   0
+    let scent-right pheromone-scent-at-angle  45
+    let scent-left  pheromone-scent-at-angle -45
+    if (scent-right > scent-ahead) or (scent-left > scent-ahead)
+    [ ifelse scent-right > scent-left
+      [ rt 45 ]
+      [ lt 45 ] ]
   ]
 end
 
-to all-circle
-  circle radius
-  display
+to wander  ;; turtle procedure
+  rt random 40
+  lt random 40
+  if not can-move? 1 [ rt 180 ]
+  fd 1
 end
 
-to circle [r]
-  ask turtles [ move-along-circle r ]
-  if plot? [ update-plots ]
+to recolor  ;; turtle procedure
+  set color red
+  if carrying-food? [ set color orange + 1]
 end
 
-to move-along-circle [r]
-  fd (pi * r / 180) * (speed / 50)
-  rt speed / 50
+to-report pheromone-scent-at-angle [angle]
+  let p patch-right-and-ahead angle 1
+  if p = nobody [ report 0 ]
+  report [pheromone] of p
 end
-
-to zero-circle
-  ask turtle 0
-    [ pen-down
-      move-along-circle radius ]
-  display
-end
-
-to draw-circle
-  clear-drawing
-  create-turtles 1
-    [ set color gray - 3
-      set size 2 * draw-radius
-      set shape "circle"
-      stamp
-      die ]
-end
-
-
-; Copyright 1997 Uri Wilensky.
-; See Info tab for full copyright and license.
 @#$#@#$#@
 GRAPHICS-WINDOW
-266
+257
 10
-825
-590
-30
-30
-9.0
+764
+538
+35
+35
+7.0
 1
 10
 1
 1
 1
 0
-1
-1
-1
--30
-30
--30
-30
-1
-1
 0
+0
+1
+-35
+35
+-35
+35
+1
+1
+1
 ticks
 30.0
 
 BUTTON
-3
-79
-95
-112
-all-circle
-all-circle
-T
-1
-T
-OBSERVER
+46
+71
+126
+104
 NIL
-NIL
-NIL
-NIL
-1
-
-SLIDER
-97
-117
-260
-150
-radius
-radius
-0.0
-30.0
-20
-1.0
-1
-NIL
-HORIZONTAL
-
-SLIDER
-97
-79
-260
-112
-speed
-speed
-0.0
-100.0
-25
-1.0
-1
-NIL
-HORIZONTAL
-
-SLIDER
-97
-42
-260
-75
-number
-number
-1.0
-300.0
-40
-1.0
-1
-NIL
-HORIZONTAL
-
-BUTTON
-2
-42
-95
-75
-setup
 setup
 NIL
 1
@@ -156,14 +171,44 @@ NIL
 NIL
 1
 
-BUTTON
-4
-154
-95
-187
-draw-circle
-draw-circle
+SLIDER
+31
+106
+221
+139
+diffusion-rate
+diffusion-rate
+0.0
+99.0
+50
+1.0
+1
 NIL
+HORIZONTAL
+
+SLIDER
+31
+141
+221
+174
+evaporation-rate
+evaporation-rate
+0.0
+99.0
+10
+1.0
+1
+NIL
+HORIZONTAL
+
+BUTTON
+136
+71
+211
+104
+NIL
+go
+T
 1
 T
 OBSERVER
@@ -174,228 +219,108 @@ NIL
 1
 
 SLIDER
-97
-154
-261
-187
-draw-radius
-draw-radius
+31
+36
+221
+69
+population
+population
 0.0
-30.0
-15
+200.0
+125
 1.0
 1
 NIL
 HORIZONTAL
-
-SWITCH
-83
-542
-183
-575
-plot?
-plot?
-0
-1
--1000
-
-BUTTON
-4
-117
-95
-150
-zero-circle
-zero-circle
-T
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
 
 PLOT
-8
-348
-259
-540
-Distance from the origin
-time
-dist
+10
+180
+245
+535
+Remaining Food
+Time
+Food
 0.0
-1440.0
+10.0
 0.0
-30.0
+10.0
 true
 false
-"set-plot-y-range 0 max-pxcor" ""
+"" ""
 PENS
-"distance" 1.0 0 -10899396 true "" "plot [distancexy 0 0] of turtle 0"
-
-BUTTON
-147
-218
-242
-251
-NIL
-pen-down
-NIL
-1
-T
-TURTLE
-NIL
-NIL
-NIL
-NIL
-1
-
-BUTTON
-147
-253
-242
-286
-NIL
-pen-up
-NIL
-1
-T
-TURTLE
-NIL
-NIL
-NIL
-NIL
-1
-
-BUTTON
-7
-253
-143
-286
-NIL
-set shape \"circle\"
-NIL
-1
-T
-TURTLE
-NIL
-NIL
-NIL
-NIL
-1
-
-BUTTON
-7
-218
-143
-251
-NIL
-set shape \"turtle\"
-NIL
-1
-T
-TURTLE
-NIL
-NIL
-NIL
-NIL
-1
-
-BUTTON
-134
-291
-252
-324
-NIL
-clear-drawing
-NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
+"default" 1.0 0 -16777216 true "" "plot sum [ food ] of patches"
 
 @#$#@#$#@
+## ACKNOWLEDGEMENT
+
+This model is from Chapter One of the book "Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo", by Uri Wilensky & William Rand.
+
+Wilensky, U & Rand, W. (2015). Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo. Cambridge, Ma. MIT Press.
+
 ## WHAT IS IT?
 
-This is a new kind of mathematical investigation — we are investigating the emergent shape created by the movement of many turtles moving independently in simple ways. Each turtle is moving so as to create a circle of a fixed radius (set by the RADIUS slider).  What happens if the radius they are all circling at is changed in mid-action? Guess before you try it.
+In this model, a colony of ants forages for food. Though each ant follows a set of simple rules, the colony as a whole acts in a sophisticated way.
 
 ## HOW IT WORKS
 
-The turtles create their circles by moving forward a little and turning right a little so as to end up with a circle of the specified radius. We start all the turtles on a circle of that radius so they move around the circle.
+When an ant finds a piece of food, it carries the food back to the nest, dropping a chemical as it moves. When other ants "sniff" the chemical, they follow the chemical toward the food. As more ants carry food to the nest, they reinforce the chemical trail.
 
 ## HOW TO USE IT
 
-The NUMBER slider determines the number of turtles circling.
+Click the SETUP button to set up the ant nest (in violet, at center) and three piles of food. Click the GO button to start the simulation. The chemical is shown in a green-to-white gradient.
 
-The RADIUS slider determines the size of the circle each turtle moves on.
+The EVAPORATION-RATE slider controls the evaporation rate of the chemical. The DIFFUSION-RATE slider controls the diffusion rate of the chemical.
 
-The SPEED slider determines how large a step each turtle take at each clock tick -- it determines the speed of circling.
-
-The SETUP button creates NUMBER turtles on a circle of radius RADIUS centered at the point (0 0). The turtles are all headed so as to move around the circle.
-
-The ALL-CIRCLE button starts the turtles circling. They are each drawing their own circle of radius RADIUS.
-
-Change the value of the RADIUS slider while the turtles are circling.  *Before* you do it, what is your guess as to what will happen when you change the RADIUS?
+If you want to change the number of ants, move the POPULATION slider before pressing SETUP.
 
 ## THINGS TO NOTICE
 
-What is happening to the shape described by the turtles?
+The ant colony generally exploits the food source in order, starting with the food closest to the nest, and finishing with the food most distant from the nest. It is more difficult for the ants to form a stable trail to the more distant food, since the chemical trail has more time to evaporate and diffuse before being reinforced.
 
-How far out do the turtles go?
+Once the colony finishes collecting the closest food, the chemical trail to that food naturally disappears, freeing up ants to help collect the other food sources. The more distant food sources require a larger "critical number" of ants to form a stable trail.
 
-How far in do they come?
-
-## THINGS TO TRY
-
-Try different values of both starting radius and changed radius.
-
-You can also do further investigations with the following controls:
-
-The ZERO-CIRCLE button lets you just focus on turtle zero's movement -- all the rest are stopped.
-
-The DRAW-CIRCLE button lets you draw a circle on the patches with a radius equal to DRAW-RAD. This way you can track the movement of the turtles.
-
-If the PLOT? switch is on, the plot will show a plot of turtle zero's distance from the origin as the turtles circle.
-
-Try the command `lt 50` while the turtles are circling. Is this the same behavior as you observed when changing the radius?
-
-In the Command Center, get a single (or several) turtles to trace their path using the command `pen-down` (`pd`).  This may help to show the relationship between the circles of individual turtles and the circle you see as they all move together.
+The consumption of the food is shown in a plot.  The line-colors in the plot match the colors of the food piles.
 
 ## EXTENDING THE MODEL
 
-What tools can you build to help visualize what is going on?
+Try different placements for the food sources. What happens if two food sources are equidistant from the nest? When that happens in the real world, ant colonies typically exploit one source then the other (not at the same time).
+
+In this project, the ants use a "trick" to find their way back to the nest: they follow the "nest scent." Real ants use a variety of different approaches to find their way back to the nest. Try to implement some alternative strategies.
+
+The ants only respond to chemical levels between 0.05 and 2.  The lower limit is used so the ants aren't infinitely sensitive.  Try removing the upper limit.  What happens?  Why?
+
+In the `uphill-chemical` procedure, the ant "follows the gradient" of the chemical. That is, it "sniffs" in three directions, then turns in the direction where the chemical is strongest. You might want to try variants of the `uphill-chemical` procedure, changing the number and placement of "ant sniffs."
+
 
 ## NETLOGO FEATURES
 
-The `display` command is used for smooth animation.
+The built-in `diffuse` primitive lets us diffuse the chemical easily without complicated code.
+
+The primitive `patch-right-and-ahead` is used to make the ants smell in different directions without actually turning.
+
+
+## RELATED MODELS
+This model is a slight modification of the Ants models in the Biology section of the NetLogo models library.
 
 
 ## HOW TO CITE
 
-If you mention this model in a publication, we ask that you include these citations for the model itself and for the NetLogo software:
+This model is part of the textbook, “Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo.”
 
-* Wilensky, U. (1997).  NetLogo Turtles Circling model.  http://ccl.northwestern.edu/netlogo/models/TurtlesCircling.  Center for Connected Learning and Computer-Based Modeling, Northwestern University, Evanston, IL.
+If you mention this model or the NetLogo software in a publication, we ask that you include the citations below.
+
+For the model itself:
+
+* Wilensky, U. (1997).  NetLogo Ants Simple model.  http://ccl.northwestern.edu/netlogo/models/IABMTextbook/AntsSimple.  Center for Connected Learning and Computer-Based Modeling, Northwestern Institute on Complex Systems, Northwestern University, Evanston, IL.
+
+Please cite the NetLogo software as:
+
 * Wilensky, U. (1999). NetLogo. http://ccl.northwestern.edu/netlogo/. Center for Connected Learning and Computer-Based Modeling, Northwestern University, Evanston, IL.
 
-## COPYRIGHT AND LICENSE
+Please cite the textbook as:
 
-Copyright 1997 Uri Wilensky.
-
-![CC BY-NC-SA 3.0](http://i.creativecommons.org/l/by-nc-sa/3.0/88x31.png)
-
-This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 3.0 License.  To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-sa/3.0/ or send a letter to Creative Commons, 559 Nathan Abbott Way, Stanford, California 94305, USA.
-
-Commercial licenses are also available. To inquire about commercial licenses, please contact Uri Wilensky at uri@northwestern.edu.
-
-This model was created as part of the project: CONNECTED MATHEMATICS: MAKING SENSE OF COMPLEX PHENOMENA THROUGH BUILDING OBJECT-BASED PARALLEL MODELS (OBPML).  The project gratefully acknowledges the support of the National Science Foundation (Applications of Advanced Technologies Program) -- grant numbers RED #9552950 and REC #9632612.
-
-This model was converted to NetLogo as part of the projects: PARTICIPATORY SIMULATIONS: NETWORK-BASED DESIGN FOR SYSTEMS LEARNING IN CLASSROOMS and/or INTEGRATED SIMULATION AND MODELING ENVIRONMENT. The project gratefully acknowledges the support of the National Science Foundation (REPP & ROLE programs) -- grant numbers REC #9814682 and REC-0126227. Converted from StarLogoT to NetLogo, 2001.
-
+* Wilensky, U & Rand, W. (2015). Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo. Cambridge, Ma. MIT Press.
 @#$#@#$#@
 default
 true
@@ -682,11 +607,6 @@ Polygon -7500403 true true 30 75 75 30 270 225 225 270
 @#$#@#$#@
 NetLogo 5.1.0
 @#$#@#$#@
-setup
-repeat 400 [ all-circle ]
-ask turtles [ pen-down ]
-set radius 20
-repeat 200 [ all-circle ]
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
@@ -703,5 +623,5 @@ Line -7500403 true 150 150 90 180
 Line -7500403 true 150 150 210 180
 
 @#$#@#$#@
-0
+1
 @#$#@#$#@

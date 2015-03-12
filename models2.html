@@ -1,0 +1,168 @@
+
+
+<div id="modelsPage">
+  <center>
+    <ul id="top-menu">
+      <li>
+        <a href="#bookModels">Book Models</a>
+      </li>
+      <li>
+        <a href="#ch0">Chapter 0</a>
+      </li>
+      <li>
+        <a href="#ch1">Chapter 1</a>
+      </li>
+      <li>
+        <a href="#ch2">Chapter 2</a>
+      </li>
+      <li>
+        <a href="#ch3">Chapter 3</a>
+      </li>
+      <li>
+        <a href="#ch4">Chapter 4</a>
+      </li>
+      <li>
+        <a href="#ch5">Chapter 5</a>
+      </li>
+      <li>
+        <a href="#ch6">Chapter 6</a>
+      </li>
+      <li>
+        <a href="#ch7">Chapter 7</a>
+      </li>
+      <li>
+        <a href="#ch8">Chapter 8</a>
+      </li>
+    </ul>
+  </center>
+
+  <div id="modelsStart"></div>
+  <div style="padding-top:61px;padding-left:15%">
+    
+    <div class="chapter-label"><h2><a id="bookModels">Introduction to Agent-based Modeling Book Models</a></h2></div>
+    This page includes all the models covered in the textbook. Each model can be downloaded and run using the free <a href="http://ccl.northwestern.edu/netlogo">NetLogo</a> software.
+    
+    <div>
+      <h2><a id="ch0" >Chapter 0</a></h2>
+      <div class="model-container">
+        <img class="model-image" width=200 height=200 src="models/images/TurtlesCircling.png">
+        <div class="model-description">
+          <div class="model-name">Turtles Circling <span class="model-page">(p. 11)</span></div>
+          This is a kind of mathematical investigation — we are investigating the emergent shape created by the movement of many turtles (arrows) moving independently in simple ways. Each turtle is moving a little step forward and taking a little turn right to stay on a circle of radius 20.
+          <div style="align-self:flex-end"><a href="/models/0TurtlesCirclingSimple.nlogo">Download</a></div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="chapter-label"><h2><a id="ch1">Chapter 1</a></h2></div>
+      <div class="model-container">
+        <img class="model-image" width=200 height=200 src="models/images/TurtlesCircling.png">
+        <div class="model-description">
+          <div class="model-name">Model 2 <span class="model-page">(p. 22)</span></div>
+          In this model, a colony of ants forages for food. Though each ant follows a set of simple rules, the colony as a whole acts in a sophisticated way.
+          <div style="align-self:flex-end;"><a href="/models/1AntsSimple.nlogo">Download</a></div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="chapter-label"><h2><a id="ch2">Chapter 2</a></h2></div>
+      <div class="model-container">
+        <img class="model-image" width=200 height=200 src="models/images/TurtlesCircling.png">
+        here is some cool info about this model<br/>
+        download it <a href="#">here</a>
+      </div>    
+    </div>
+    <div>
+      <div class="chapter-label"><h2><a id="ch3">Chapter 3</a></h2></div>
+      <div class="model-container">
+        <img class="model-image" width=200 height=200 src="models/images/TurtlesCircling.png">
+        here is some cool info about this model<br/>
+        download it <a href="#">here</a>
+      </div>
+    </div>
+    <div>
+      <div class="chapter-label"><h2><a id="ch4">Chapter 4</a></h2></div>
+    </div>
+    <div>
+      <div class="chapter-label"><h2><a id="ch5">Chapter 5</a></h2></div>
+    </div>
+    <div>
+     <div class="chapter-label"><h2> <a id="ch6">Chapter 6</a></h2></div>
+    </div>
+    <div>
+     <div class="chapter-label"><h2> <a id="ch7">Chapter 7</a></h2></div>
+    </div>
+    <div>
+      <div class="chapter-label"><h2><a id="ch8">Chapter 8</a></h2></div>
+    </div>
+  </div>
+</div>
+
+
+<script type="text/javascript">
+// Cache selectors
+var lastId,
+    topMenu = $("#top-menu"),
+    topMenuHeight = topMenu.outerHeight()+15,
+    // All list items
+    menuItems = topMenu.find("a"),
+    // Anchors corresponding to menu items
+    scrollItems = menuItems.map(function(){
+      var item = $($(this).attr("href"));
+      if (item.length) { return item; }
+    });
+
+// Bind click handler to menu items
+// so we can get a fancy scroll animation
+menuItems.click(function(e){
+  var href = $(this).attr("href"),
+      offsetTop = href === "#" ? 0 : $(href).offset().top-topMenuHeight+1;
+  $('html, body').stop().animate({ 
+      scrollTop: offsetTop - 50
+  }, 300);
+  e.preventDefault();
+});
+
+// Bind to scroll
+$(window).scroll(function(){
+   // Get container scroll position
+   var fromTop = $(this).scrollTop()+topMenuHeight + 55;
+   
+   // Get id of current scroll item
+   var cur = scrollItems.map(function(){
+     if ($(this).offset().top < fromTop)
+       return this;
+   });
+
+   // Get the id of the current element
+   cur = cur[cur.length-1];
+   var id = cur && cur.length ? cur[0].id : "";
+   
+   if (lastId !== id) {
+       lastId = id;
+       // Set/remove active class
+       menuItems
+         .parent().removeClass("active")
+         .end().filter("[href=#"+id+"]").parent().addClass("active");
+   }                   
+});
+
+// sticky header stuff
+$(function(){
+  // Check the initial Poistion of the Sticky Header
+  var stickyHeaderTop = $('#top-menu').offset().top;
+
+  $(window).scroll(function(){
+    if( $(window).scrollTop() > stickyHeaderTop ) {
+      $('#top-menu').css({position: 'fixed', top: '0px'});
+      $('#modelsStart').css('display', 'block');
+    } else {
+      $('#top-menu').css({position: 'static', top: '0px'});
+      $('#modelsStart').css('display', 'none');
+    }
+  });
+});
+
+</script>

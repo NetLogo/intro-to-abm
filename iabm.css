@@ -1,12 +1,54 @@
+	* {
+		font-family: 'PT Sans', Helvetica, Arial, sans-serif;
+		line-height: 21px;
+	}
+
+	h1 {
+	    font-family: 'Arvo', Georgia, Times, serif;
+	    font-size: 59px;
+	    line-height: 70px;
+	}	
+
+	h2 {
+	    font-family: 'Arvo', Georgia, Times, serif;
+	    font-size: 24px;
+	    line-height: 20px;
+	}	
+
+	h3, .model-name {
+	    font-family: 'Arvo', Georgia, Times, serif;
+	    font-size: 19px;
+	    line-height: 10px;
+	}	
+
+	p {
+	    font-family: 'PT Sans', Helvetica, Arial, sans-serif;
+	    font-size: 16px;
+	    line-height: 21px;
+		text-align: justify;
+	    text-justify: inter-word;
+	}
+
+	a {
+		text-decoration: underline;
+		color: #b24926;
+	}
+
+	a:hover {
+		color:#333;
+		text-decoration: none;
+		cursor: pointer;
+	}
+
 	nav {
 	  mask-image: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, #ffffff 25%, #ffffff 75%, rgba(255, 255, 255, 0) 100%);
 	  margin-left: auto;
-    margin-right: auto;
-    margin-top: -22px;
-    width: 100%;
-    background-image: url("images/nav-background.jpg");
-    background-size: 100% 100%;
-    background-repeat: no-repeat;
+	    margin-right: auto;
+	    margin-top: -22px;
+	    width: 100%;
+	    background-image: url("images/nav-background.jpg");
+	    background-size: 100% 100%;
+	    background-repeat: no-repeat;
 	}
 
 	nav ul {
@@ -55,7 +97,89 @@
 	}
 	
 	.quote-body {
-		font-size: 19px;
+	  font-family: "Times New Roman";
+		font-size: 14px;
 		margin: 0px;
 		font-style: italic;
+		line-height: 18px;
 	}
+
+	.quote-source {
+		padding-top:6px;
+		text-align:end;
+		font-size:14px;
+	}
+
+/***	NetLogo Models Page 	***/
+	#modelsPage a {
+		text-decoration: none;
+		color:#333;
+	}
+
+  #top-menu {
+      /*position: fixed;*/
+      z-index: 1;
+      background: white;
+      left: 0;
+      right: 0;
+      top: 0;
+      list-style: none;
+      padding-left:11%;
+      margin-top:0px;
+  }
+
+  #top-menu li {
+      float: left;
+  }
+
+  #top-menu a {
+      display: block;
+      padding: 5px 23px 7px 23px;
+      width: 4em;
+      text-align: center;
+      -webkit-transition: .5s all ease-out;
+      -moz-transition: .5s all ease-out;
+      transition: .5s all ease-out;
+      border-top: 3px solid white;
+      color: #aaa;
+      text-decoration: none;
+  }
+
+  #top-menu a:hover {
+      color: #000;
+  }
+
+  #top-menu li.active a {
+      border-top: 3px solid #333;
+      color: #333;
+  }
+
+  .model-image {
+    padding-left: 15px;
+  }
+
+  .model-container {
+    display: flex;
+    align-content: space-between;
+    width: 82%;
+  }
+
+  .model-image {
+    order:1
+  }
+
+  .model-name {
+    margin-top:0px;
+  }
+
+  .model-description {
+    diplay:item;
+    order:2;
+    padding-left:16px;
+  }
+
+  .model-page {
+  	font-size:11px;
+  	font-family: 'PT Sans', Helvetica, Arial, sans-serif;
+  }
+
