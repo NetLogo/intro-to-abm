@@ -183,3 +183,23 @@
   	font-family: 'PT Sans', Helvetica, Arial, sans-serif;
   }
 
+  .model-download-link{
+  	font-size:15px; 
+  	vertical-align: text-bottom;
+  	color: #b24926;
+  	background: url('images/download-orange.png');
+		background-size: 20px;
+		background-repeat: no-repeat;
+		background-position: 0px 0px;
+		padding-left: 22px;
+		padding-top: 3px;
+  }
+
+  .model-download-link:hover {
+  	color: #333;
+  	background: url('images/download.png');
+		background-size: 20px;
+		background-repeat: no-repeat;
+		background-position: 0px 0px;
+		padding-top: 3px;
+  }
