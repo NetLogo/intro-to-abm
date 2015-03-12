@@ -40,7 +40,7 @@
   <div style="padding-top:61px;padding-left:15%">
     
     <div class="chapter-label"><h2><a id="bookModels">Introduction to Agent-based Modeling Book Models</a></h2></div>
-    This page includes all the models covered in the textbook. Each model can be downloaded and run using the free <a href="http://ccl.northwestern.edu/netlogo">NetLogo</a> software.
+    This page includes all the models covered in the textbook. Each model can be downloaded and run using the free <a href="http://ccl.northwestern.edu/netlogo" id="NetLogoLink">NetLogo</a> software.
     
     <div>
       <h2><a id="ch0" >Chapter 0</a></h2>
@@ -51,10 +51,7 @@
           This is a kind of mathematical investigation — we are investigating the emergent shape created by the movement of many turtles (arrows) moving independently in simple ways. Each turtle is moving a little step forward and taking a little turn right to stay on a circle of radius 20.
           
           <div style="padding-top:8px;">
-            <a href="/models/0TurtlesCirclingSimple.nlogo" >
-              <!-- <img style="height:24px;" src="images/download-orange.png"/> -->
-              <div class="model-download-link" style="width:114px;">Download Model</div>
-            </a>
+            <a href="/models/0TurtlesCirclingSimple.nlogo" class="model-download-link">Download Model</a>
           </div>
         </div>
       </div>
@@ -62,12 +59,15 @@
 
     <div>
       <div class="chapter-label"><h2><a id="ch1">Chapter 1</a></h2></div>
+      
       <div class="model-container">
-        <img class="model-image" width=200 height=200 src="models/images/TurtlesCircling.png">
+        <img class="model-image" width=200 height=200 src="models/images/AntsSimple.png">
         <div class="model-description">
-          <div class="model-name">Model 2 <span class="model-page">(p. 22)</span></div>
+          <div class="model-name">Ants <span class="model-page">(p. 22)</span></div>
           In this model, a colony of ants forages for food. Though each ant follows a set of simple rules, the colony as a whole acts in a sophisticated way.
-          <div style="align-self:flex-end;"><a href="/models/1AntsSimple.nlogo">Download</a></div>
+          <div style="padding-top:8px;">
+            <a href="/models/AntsSimple.nlogo" class="model-download-link">Download Model</a>
+          </div>
         </div>
       </div>
     </div>
@@ -75,11 +75,41 @@
     <div>
       <div class="chapter-label"><h2><a id="ch2">Chapter 2</a></h2></div>
       <div class="model-container">
-        <img class="model-image" width=200 height=200 src="models/images/TurtlesCircling.png">
-        here is some cool info about this model<br/>
-        download it <a href="#">here</a>
-      </div>    
+        <img class="model-image" width=200 height=200 src="models/images/HeroesAndCowards.png">
+        <div class="model-description">
+          <div class="model-name">Heroes and Cowards <span class="model-page">(p. 22)</span></div>
+          This model demonstrates the “Heroes and Cowards game. In the game, each person arbitrarily chooses someone else in the room to be their perceived friend, and someone to be their perceived enemy. They don’t tell anyone who they have chosen, but they all move to position themselves either such that a) they are between their friend and their enemy (BRAVE/DEFENDING), or b) such that they are behind their friend relative to their enemy (COWARDLY/FLEEING).<br/><br/>
+          This simple model demonstrates an idealized form of this game played out by computational agents. Mostly it demonstrates how rich, complex, and surprising behavior can emerge from simple rules and interactions
+          <div style="padding-top:8px;">
+            <a href="/models/HeroesAndCowards.nlogo" class="model-download-link">Download Model</a>
+          </div>
+        </div>
+      </div>   
+
+      <div class="model-container">
+        <img class="model-image" width=200 height=200 src="models/images/AntsSimple.png">
+        <div class="model-description">
+          <div class="model-name">Life<span class="model-page">(p. 22)</span></div>
+          This program is a simple example of the Life model, which is a 2D cellular automaton.<br/><br/>
+          A cellular automaton is a computational machine that performs actions based on certain rules. It can be thought of as a board which is divided into cells (such as square cells of a checkerboard). Each cell can be either “alive” or “dead.” This is called the “state” of the cell. According to specified rules, each cell will be alive or dead at the next time step.
+          <div style="padding-top:8px;">
+            <a href="/models/Life%20Simple.nlogo" class="model-download-link">Download Model</a>
+          </div>
+        </div>
+      </div>
+    
+      <div class="model-container">
+        <img class="model-image" width=200 height=200 src="models/images/SimpleEconomy.png">
+        <div class="model-description">
+          <div class="model-name">Simple Economy <span class="model-page">(p. 22)</span></div>
+          This model is a very simple model of economic exchange. It is a thought experiment of a world where, in every time step, each person gives one dollar to one other person (at random) if they have any money to give. If they have no money then they do not give out any money.
+          <div style="padding-top:8px;">
+            <a href="/models/Simple%20Economy.nlogo" class="model-download-link">Download Model</a>
+          </div>
+        </div>
+      </div>
     </div>
+
     <div>
       <div class="chapter-label"><h2><a id="ch3">Chapter 3</a></h2></div>
       <div class="model-container">

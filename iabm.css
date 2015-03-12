@@ -154,18 +154,17 @@
       color: #333;
   }
 
-  .model-image {
-    padding-left: 15px;
-  }
-
   .model-container {
     display: flex;
     align-content: space-between;
     width: 82%;
+    padding-bottom: 20px;
+    padding-left: 16px;
   }
 
   .model-image {
-    order:1
+    order:1;
+    box-shadow: 5px 5px 10px #888888;
   }
 
   .model-name {
@@ -176,6 +175,7 @@
     diplay:item;
     order:2;
     padding-left:16px;
+    padding-top:5px;
   }
 
   .model-page {
@@ -183,7 +183,7 @@
   	font-family: 'PT Sans', Helvetica, Arial, sans-serif;
   }
 
-  .model-download-link{
+  #modelsPage .model-download-link{
   	font-size:15px; 
   	vertical-align: text-bottom;
   	color: #b24926;
@@ -192,14 +192,14 @@
 		background-repeat: no-repeat;
 		background-position: 0px 0px;
 		padding-left: 22px;
-		padding-top: 3px;
+		padding-top: 5px;
   }
 
-  .model-download-link:hover {
+  #modelsPage .model-download-link:hover {
   	color: #333;
   	background: url('images/download.png');
 		background-size: 20px;
 		background-repeat: no-repeat;
 		background-position: 0px 0px;
-		padding-top: 3px;
+		padding-top: 5px;
   }
