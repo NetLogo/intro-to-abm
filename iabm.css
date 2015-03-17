@@ -213,12 +213,12 @@
 		background-size: 16px;
 		padding-top: 3px;
 		padding-left: 17px;
-		vertical-align: bottom;
+		vertical-align: text-top;
   }
 
   #modelsPage .small:hover {
 		background-size: 16px;
 		padding-top: 3px;
 		padding-left: 17px;
-		vertical-align: bottom;
+		vertical-align: text-top;
   }
