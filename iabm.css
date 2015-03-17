@@ -207,3 +207,18 @@
 		background-position: 0px 0px;
 		padding-top: 5px;
   }
+
+  #modelsPage .small{
+  	font-size:13px; 
+		background-size: 16px;
+		padding-top: 3px;
+		padding-left: 17px;
+		vertical-align: bottom;
+  }
+
+  #modelsPage .small:hover {
+		background-size: 16px;
+		padding-top: 3px;
+		padding-left: 17px;
+		vertical-align: bottom;
+  }
