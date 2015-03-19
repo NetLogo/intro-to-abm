@@ -159,6 +159,7 @@
   }
 
   .model-container {
+    display: -webkit-flex;
     display: flex;
     align-content: space-between;
     width: 82%;
@@ -176,6 +177,7 @@
   }
 
   .model-description {
+    diplay:-webkit-item;
     diplay:item;
     order:2;
     padding-left:16px;
