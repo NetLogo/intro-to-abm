@@ -9,20 +9,36 @@
 		<link type="text/css" rel="stylesheet" media="all" href="iabm.css"/>
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
 
+		<script src='prefixfree.min.js'></script>
+
+
 		<script src='password.js'></script>
 		<script>
 			promptForPassword();
+
+			// alternative for loading properly handled css stuff - cross browser
+			// function loadContent(page) {
+			// 	$("#content").load(page + ".html", function(data){
+			// 	 cleanedData = PrefixFree.prefixCSS(data);
+			// 	 $("#content").html(cleanedData);
+			// 	});
+			// }
+
 		</script>
 
 		<link href="http://fonts.googleapis.com/css?family=Arvo" rel="stylesheet" type="text/css">
 		<link href="http://fonts.googleapis.com/css?family=PT+Sans" rel="stylesheet" type="text/css">
 
 	</head>
-	<body style="margin:0px;">
-		<a href="index.html">
-			<img src="images/flock.jpg" style="float:right; z-index:5;position:absolute; width:286px;margin-left:77%" />
-			<img src="images/iabm-cover-title.jpg" alt="Introduction to Agent-based Modeling" style="width:100%;">
-		</a>
+
+<body style="margin:0px;">
+
+<div class="wrapper">
+  <header class="header">
+	<a href="index.html">
+		<img src="images/flock.jpg" style="float:right; z-index:5;position:absolute; width:23%;margin-left:77%" />
+		<img src="images/iabm-cover-title.jpg" alt="Introduction to Agent-based Modeling" style="width:100%;">
+	</a>
 	<nav>
 	  <ul>
 	    <li>
@@ -48,72 +64,74 @@
 	    </li>
 	  </ul>
 	</nav>
-	<div>
-		<div id="page-background" style='color: #000; font-family: Arial,Tahoma,Verdana; font-size: 13px; line-height: 20px; margin: 0 auto;'>
-			<div id="content">
-				<div>
- 					<center>
- 						<h2 style="padding-top:10px;text-align:center;">A new textbook from the creator and author of NetLogo </h2>
-					</center>
-					<div style="float:right; width:43%; padding-right:13%">
+  </header>
+  <aside class="aside aside-1">&nbsp;</aside>
+  <article id="content" class="main">
+	<div style="margin:auto;">
+		<h2 style="padding-top:10px;text-align:center;">A new textbook from the creator and author of NetLogo </h2>
+	</div>
+	<div style="display:flex;">
+		<div>
+			<img src="images/iabm-cover.jpg" alt="Introduction to Agent-based Modeling" style="width:100%;">
+			<br/>
+			<div style="padding-top: 11px; text-align: center;">
+				Available from:<br/>
+				<a href="http://mitpress.mit.edu/books/introduction-agent-based-modeling" target="_blank"><img src="images/mit_press.png" style="height:14%;"/></a>
+				<br/>
+				Also available on <a href="http://amzn.com/0262731894" target="_blank">Amazon</a>
+			</div>
+		</div>
+		<div style="padding-left:2%;width:100%">
+			<p style="margin-top: -4px;">The advent of widespread fast computing has enabled us to work on more complex problems and to build and analyze more complex models. This book provides an introduction to one of the primary methodologies for research in this new field of knowledge. Agent-based modeling (ABM) offers a new way of doing science: by conducting computer-based experiments. ABM is applicable to complex systems embedded in natural, social, and engineered contexts, across domains that range from engineering to ecology. <i>An Introduction to Agent-Based Modeling</i> offers a comprehensive description of the core concepts, methods, and applications of ABM. Its hands-on approach—with hundreds of examples and exercises using <a href="http://ccl.northwestern.edu/netlogo/" target="_blank">NetLogo</a>—enables readers to begin constructing models immediately, regardless of experience or discipline.</p>
 
-						<p>The advent of widespread fast computing has enabled us to work on more complex problems and to build and analyze more complex models. This book provides an introduction to one of the primary methodologies for research in this new field of knowledge. Agent-based modeling (ABM) offers a new way of doing science: by conducting computer-based experiments. ABM is applicable to complex systems embedded in natural, social, and engineered contexts, across domains that range from engineering to ecology. <i>An Introduction to Agent-Based Modeling</i> offers a comprehensive description of the core concepts, methods, and applications of ABM. Its hands-on approach—with hundreds of examples and exercises using NetLogo—enables readers to begin constructing models immediately, regardless of experience or discipline.</p>
+			<p>	The book first describes the nature and rationale of agent-based modeling, then presents the methodology for designing and building ABMs, and finally discusses how to utilize ABMs to answer complex questions. Features in each chapter include step-by-step guides to developing models in the main text; text boxes with additional information and concepts; end-of-chapter explorations; and references and lists of relevant reading.</p>
 
-						<p>	The book first describes the nature and rationale of agent-based modeling, then presents the methodology for designing and building ABMs, and finally discusses how to utilize ABMs to answer complex questions. Features in each chapter include step-by-step guides to developing models in the main text; text boxes with additional information and concepts; end-of-chapter explorations; and references and lists of relevant reading. This website is a supplment to the textbook.</p>
+			<br/>
 
-						<br/>
-						<div>
-							<span class="quote">&#8220;</span>
-							<div class="quote-body" style="font-size: 19px;">Wilensky and Rand have set the standard for textbooks on this topic. An essential contribution.</div><div class="quote" style="float:right;">&#8221;</div>
-							<div class="quote-source">
-								— Joshua M. Epstein, Johns Hopkins University and the Santa Fe Institute<br/>
-								<a href="#" onclick='$("#content").load("testimonials.html");' style="text-align:right">Read More...</a>
-							</div>
-						</div>
-					</div>
+			<div>
+				<span class="quote">&#8220;</span>
+				<div class="quote-body" style="font-size: 19px;">Wilensky and Rand have set the standard for textbooks on this topic. An essential contribution.</div><div class="quote" style="text-align:right;margin-top:9px;">&#8221;</div>
+				<div style="text-align:end;font-size:14px;">
+					— Joshua M. Epstein, Johns Hopkins University and the Santa Fe Institute<br/>
 
-					<div>
-						<img src="images/iabm-cover.jpg" alt="Introduction to Agent-based Modeling" style="width:28%; padding-left:13%;margin-top:19px;">
-						<br/>
-						<div style="padding-left:13%;margin-top:19px;width:28%">
-							<center>
-								Available from:<br/>
-								<a href="http://mitpress.mit.edu/books/introduction-agent-based-modeling" target="_blank"><img src="images/mit_press.png" style="height:88px;"/></a>
-								<br/>
-								Also available on <a href="http://amzn.com/0262731894" target="_blank">Amazon</a>
-
-							</center>
-							<br/>
-						</div>
-					</div>
+					<a href="#" onclick='$("#content").load("testimonials.html");' style="text-align:right">Read More...</a>
 				</div>
+			</div>
+
 		</div>
 	</div>
-	<div>
-		<nav style="margin-top:0px;">
-		  <ul>
-		    <li>
-		      <a href="#"  onclick='$("#content").load("home.html");'>Home</a>
-		    </li>
-		    <li>
-		      <a href="#" onclick='$("#content").load("authors.html");'>Authors</a>
-			</li>
-		    <li>
-		      <a href="#" onclick='$("#content").load("models2.html");'>NetLogo Models</a>
-		    </li>
-		    <li>
-		      <a href="#" onclick='$("#content").load("resources.html");'>Resources</a>
-    	    <li>
-		      <a href="#" onclick='$("#content").load("testimonials.html");'>Endorsements</a>
-		    </li>
-		    <li>
-		      <a href="#" onclick='$("#content").load("updates.html");'>Book Updates</a>
-		    </li>
-		    <li>
-		      <a href="mailto:iabm@ccl.northwestern.edu">Contact</a>
-		    </li>
-		  </ul>
-		</nav>
-	</div>
+
+
+
+  </article>
+  <aside class="aside aside-2">&nbsp;</aside>
+
+  <footer class="footer">
+  	<nav style="margin-top:0px;">
+	  <ul>
+	    <li>
+	      <a href="#"  onclick='$("#content").load("home.html");'>Home</a>
+	    </li>
+	    <li>
+	      <a href="#" onclick='$("#content").load("authors.html");'>Authors</a>
+		</li>
+	    <li>
+	      <a href="#" onclick='$("#content").load("models2.html");'>NetLogo Models</a>
+	    </li>
+	    <li>
+	      <a href="#" onclick='$("#content").load("resources.html");'>Resources</a>
+	    <li>
+	      <a href="#" onclick='$("#content").load("testimonials.html");'>Endorsements</a>
+	    </li>
+	    <li>
+	      <a href="#" onclick='$("#content").load("updates.html");'>Book Updates</a>
+	    </li>
+	    <li>
+	      <a href="mailto:iabm@ccl.northwestern.edu">Contact</a>
+	    </li>
+	  </ul>
+	</nav>
+	</footer>
+</div>
 	</body>
 </html>
