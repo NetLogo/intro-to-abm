@@ -33,22 +33,22 @@
       <nav>
         <ul>
           <li>
-            <a href="#" onclick='$("#content").load("home.html");'>Home</a>
+            <a href='#home'>Home</a>
           </li>
           <li>
-            <a href="#" onclick='$("#content").load("authors.html");'>Authors</a>
+            <a href="#authors">Authors</a>
           </li>
           <li>
-            <a href="#" onclick='$("#content").load("models2.html");'>NetLogo Models</a>
+            <a href="#models2">NetLogo Models</a>
           </li>
           <li>
-            <a href="#" onclick='$("#content").load("resources.html");'>Resources</a>
+            <a href="#resources">Resources</a>
           </li>
           <li>
-            <a href="#" onclick='$("#content").load("testimonials.html");'>Endorsements</a>
+            <a href="#testimonials">Endorsements</a>
           </li>
           <li>
-            <a href="#" onclick='$("#content").load("updates.html");'>Book Updates</a>
+            <a href="#updates">Book Updates</a>
           </li>
           <li>
             <a href="mailto:iabm@ccl.northwestern.edu">Contact</a>
@@ -58,39 +58,6 @@
     </header>
     <aside class="aside aside-1">&nbsp;</aside>
     <article id="content" class="main">
-      <div style="margin:auto;">
-        <h2 style="padding-top:10px;text-align:center;">A new textbook from the creator and author of NetLogo </h2>
-      </div>
-      <div style="display:flex;">
-        <div>
-          <img src="images/iabm-cover.jpg" alt="Introduction to Agent-based Modeling" style="width:100%;">
-          <br/>
-          <div style="padding-top: 11px; text-align: center;">
-            Available from:<br/>
-            <a href="http://mitpress.mit.edu/books/introduction-agent-based-modeling" target="_blank"><img src="images/mit_press.png" style="height:14%;"/></a>
-            <br/>
-            Also available on <a href="http://amzn.com/0262731894" target="_blank">Amazon</a>
-          </div>
-        </div>
-        <div style="padding-left:2%;width:100%">
-          <p style="margin-top: -4px;">The advent of widespread fast computing has enabled us to work on more complex problems and to build and analyze more complex models. This book provides an introduction to one of the primary methodologies for research in this new field of knowledge. Agent-based modeling (ABM) offers a new way of doing science: by conducting computer-based experiments. ABM is applicable to complex systems embedded in natural, social, and engineered contexts, across domains that range from engineering to ecology. <i>An Introduction to Agent-Based Modeling</i> offers a comprehensive description of the core concepts, methods, and applications of ABM. Its hands-on approach—with hundreds of examples and exercises using <a href="http://ccl.northwestern.edu/netlogo/" target="_blank">NetLogo</a>—enables readers to begin constructing models immediately, regardless of experience or discipline.</p>
-
-          <p>   The book first describes the nature and rationale of agent-based modeling, then presents the methodology for designing and building ABMs, and finally discusses how to utilize ABMs to answer complex questions. Features in each chapter include step-by-step guides to developing models in the main text; text boxes with additional information and concepts; end-of-chapter explorations; and references and lists of relevant reading.</p>
-
-          <br/>
-
-          <div>
-            <span class="quote">&#8220;</span>
-            <div class="quote-body" style="font-size: 19px;">Wilensky and Rand have set the standard for textbooks on this topic. An essential contribution.</div><div class="quote" style="text-align:right;margin-top:9px;">&#8221;</div>
-            <div style="text-align:end;font-size:14px;">
-              — Joshua M. Epstein, Johns Hopkins University and the Santa Fe Institute<br/>
-
-              <a href="#" onclick='$("#content").load("testimonials.html");' style="text-align:right">Read More...</a>
-            </div>
-          </div>
-
-        </div>
-      </div>
     </article>
     <aside class="aside aside-2">&nbsp;</aside>
 
@@ -98,28 +65,40 @@
       <nav style="margin-top:0px;">
         <ul>
           <li>
-            <a href="#"  onclick='$("#content").load("home.html");'>Home</a>
+            <a href='#home'>Home</a>
           </li>
           <li>
-            <a href="#" onclick='$("#content").load("authors.html");'>Authors</a>
+            <a href="#authors">Authors</a>
           </li>
           <li>
-            <a href="#" onclick='$("#content").load("models2.html");'>NetLogo Models</a>
+            <a href="#models2">NetLogo Models</a>
           </li>
           <li>
-            <a href="#" onclick='$("#content").load("resources.html");'>Resources</a>
-            <li>
-              <a href="#" onclick='$("#content").load("testimonials.html");'>Endorsements</a>
-            </li>
-            <li>
-              <a href="#" onclick='$("#content").load("updates.html");'>Book Updates</a>
-            </li>
-            <li>
-              <a href="mailto:iabm@ccl.northwestern.edu">Contact</a>
-            </li>
+            <a href="#resources">Resources</a>
+          </li>
+          <li>
+            <a href="#testimonials">Endorsements</a>
+          </li>
+          <li>
+            <a href="#updates">Book Updates</a>
+          </li>
+          <li>
+            <a href="mailto:iabm@ccl.northwestern.edu">Contact</a>
+          </li>
         </ul>
       </nav>
     </footer>
   </div>
 </body>
+<script>
+  window.addEventListener('hashchange', loadContents);
+  function loadContents() {
+    var page=window.location.hash.substring(1) + '.html';
+    if (page === '.html') {
+      page = 'home.html';
+    }
+    $('#content').load(page);
+  }
+  loadContents();
+</script>
 </html>
