@@ -24,6 +24,7 @@
 
       The first statement regarding a brave agent is correct. However, a more accurate description of a coward agent should be “the ACT-COWARDLY code points the turtle toward a point that is <i>half</i> as far from its FRIEND as the FRIEND is from the ENEMY”. In other words, according to the code and figure, the coward would like to hide and stay “close” to its friend.
       <br/>
+      <br/>
       The code for the heroes and cowards model is deliberately not quite correct. In exploration 13, we ask readers to find and fix the bug.  Here is a link to a corrected version of the model: <a href='models/Heroes and Cowards (exploration 13).nlogo'>Heroes and Cowards (exploration 13).nlogo</a>
 
     </li>
@@ -89,6 +90,41 @@
 
     <li>
       On page 375, the textbook is assuming you are using the latest version of the gogoboard hardware, which uses an HID (Human Interface Device) interface. If you have an older version of the board that uses the serial interface, then load the gogo-serial extension.
+    </li>
+
+    <li>
+      On page 400, the code for the setup procedure of the Sandpile Simple model is shown as follows:
+      <pre style='font-family: monospace;'>
+      to setup [setup-task]
+        clear-all
+        ask patches [
+          ;; n is set to the result of running the initial-task (which is an input to the
+          ;; set procedure)
+          set n runresult setup-task
+          recolor
+        ]
+        set total sum [n] of patches
+        reset-ticks
+      end
+      </pre>
+
+      It should actually be:
+
+      <pre style='font-family: monospace;'>
+      to setup [setup-task]
+        clear-all
+        ask patches [
+          ;; n is set to the result of running the initial-task (which is an input to the
+          ;; set procedure)
+          set n runresult setup-task
+          recolor
+        ]
+        set total sum [n] of patches
+        ;; set this to the empty list so we can add items to it later
+        set sizes []
+        reset-ticks
+      end
+      </pre>
     </li>
   </ul>
 </div>
