@@ -49,7 +49,7 @@
           <img class="model-image" src="models/images/TurtlesCircling.png">
         </div>
         <div class="model-description">
-          <div class="model-name">Turtles Circling <span class="model-page">(p. 11)</span></div>
+          <div class="model-name">Turtles Circling <span class="model-page">(p. 8)</span></div>
           This is a kind of mathematical investigation — we are investigating the emergent shape created by the movement of many turtles (arrows) moving independently in simple ways. Each turtle is moving a little step forward and taking a little turn right to stay on a circle of radius 20.
           
           <div style="padding-top:8px;">
@@ -67,7 +67,7 @@
           <img class="model-image" src="models/images/AntsSimple.png">
         </div>
         <div class="model-description">
-          <div class="model-name">Ants <span class="model-page">(p. 22)</span></div>
+          <div class="model-name">Ants<span class="model-page"> (p. 26)</span></div>
           In this model, a colony of ants forages for food. Though each ant follows a set of simple rules, the colony as a whole acts in a sophisticated way.
           <div style="padding-top:8px;">
             <a href="/models/AntsSimple.nlogo" class="model-download-link">Download Model</a>
@@ -78,12 +78,27 @@
 
     <div>
       <div class="chapter-label"><h2><a id="ch2">Chapter 2 - Creating Simple Agent-Based Models</a></h2></div>
+
+      <div class="model-container">
+        <div class="model-image-wrapper">
+          <img class="model-image" src="models/images/LifeSimple.png">
+        </div>
+        <div class="model-description">
+          <div class="model-name">Life<span class="model-page"> (p. 55)</span></div>
+          This program is a simple example of the Life model, which is a 2D cellular automaton.<br/><br/>
+          A cellular automaton is a computational machine that performs actions based on certain rules. It can be thought of as a board which is divided into cells (such as square cells of a checkerboard). Each cell can be either “alive” or “dead.” This is called the “state” of the cell. According to specified rules, each cell will be alive or dead at the next time step.
+          <div style="padding-top:8px;">
+            <a href="/models/Life%20Simple.nlogo" class="model-download-link">Download Model</a>
+          </div>
+        </div>
+      </div>
+
       <div class="model-container">
         <div class="model-image-wrapper">
           <img class="model-image" src="models/images/HeroesAndCowards.png">
         </div>
         <div class="model-description">
-          <div class="model-name">Heroes and Cowards <span class="model-page">(p. 22)</span></div>
+          <div class="model-name">Heroes and Cowards <span class="model-page">(p. 68)</span></div>
           This model demonstrates the “Heroes and Cowards game. In the game, each person arbitrarily chooses someone else in the room to be their perceived friend, and someone to be their perceived enemy. They don’t tell anyone who they have chosen, but they all move to position themselves either such that a) they are between their friend and their enemy, or b) such that they are behind their friend relative to their enemy.<br/><br/>
           This simple model demonstrates an idealized form of this game played out by computational agents. Mostly it demonstrates how rich, complex, and surprising behavior can emerge from simple rules and interactions
           <div style="padding-top:8px;">
@@ -94,24 +109,10 @@
 
       <div class="model-container">
         <div class="model-image-wrapper">
-          <img class="model-image" src="models/images/LifeSimple.png">
-        </div>
-        <div class="model-description">
-          <div class="model-name">Life<span class="model-page">(p. 22)</span></div>
-          This program is a simple example of the Life model, which is a 2D cellular automaton.<br/><br/>
-          A cellular automaton is a computational machine that performs actions based on certain rules. It can be thought of as a board which is divided into cells (such as square cells of a checkerboard). Each cell can be either “alive” or “dead.” This is called the “state” of the cell. According to specified rules, each cell will be alive or dead at the next time step.
-          <div style="padding-top:8px;">
-            <a href="/models/Life%20Simple.nlogo" class="model-download-link">Download Model</a>
-          </div>
-        </div>
-      </div>
-    
-      <div class="model-container">
-        <div class="model-image-wrapper">
           <img class="model-image" src="models/images/SimpleEconomy.png">
         </div>
         <div class="model-description">
-          <div class="model-name">Simple Economy <span class="model-page">(p. 22)</span></div>
+          <div class="model-name">Simple Economy <span class="model-page">(p. 87)</span></div>
           This model is a very simple model of economic exchange. It is a thought experiment of a world where, in every time step, each person gives one dollar to one other person (at random) if they have any money to give. If they have no money then they do not give out any money.
           <div style="padding-top:8px;">
             <a href="/models/Simple%20Economy.nlogo" class="model-download-link">Download Model</a>
@@ -122,19 +123,56 @@
 
     <div>
       <div class="chapter-label"><h2><a id="ch3">Chapter 3 - Exploring and Extending Agent-Based Models</a></h2></div>
+
+      <div class="model-container">
+        <div class="model-image-wrapper">
+          <img class="model-image" src="models/images/FireSimple.png">
+        </div>
+        <div class="model-description">
+          <div class="model-name">Fire Simple<span class="model-page"> (p. 105)</span></div>
+          This model simulates the spread of a fire through a forest. It shows that the fire’s chance of reaching the right edge of the forest depends critically on the density of trees. This is an example of a common feature of complex systems, the presence of a non-linear threshold or critical parameter.
+          <div style="padding-top:8px;">
+            <a href="/models/FireSimple.nlogo" class="model-download-link">Download Fire Simple Model</a>
+          </div>
+
+          <div style="padding-top:5px;">In this chapter we make three extensions to the Fire Simple model:<br/>
+            (1) <a href="/models/FireSimpleExtension1.nlogo" class="model-download-link small">Probablistic Spreading of Fire</a><br/>(2) <a href="/models/FireSimpleExtension2.nlogo" class="model-download-link small">Adding Wind</a><br/> (3) <a href="/models/FireSimpleExtension3.nlogo" class="model-download-link small">Allowing Sparks to Jump</a> 
+          </div>
+
+        </div>
+      </div>
+
       <div class="model-container">
         <div class="model-image-wrapper">
           <img class="model-image" src="models/images/DLASimple.png">
         </div>
         <div class="model-description">
-          <div class="model-name">DLA Simple<span class="model-page">(p. 22)</span></div>
+          <div class="model-name">DLA Simple<span class="model-page"> (p. 118)</span></div>
           This model demonstrates diffusion-limited aggregation, in which particles moving (diffusing) in random trajectories stick together (aggregate) to form beautiful treelike branching fractal structures. There are many patterns found in nature that resemble the patterns produced by this model: crystals, coral, fungi, lightning, and so on.
           <div style="padding-top:8px;">
             <a href="/models/DLASimple.nlogo" class="model-download-link">Download DLA Simple Model</a>
           </div>
 
           <div style="padding-top:5px;">In this chapter we make three extensions to the DLA Simple model:<br/>
-            (1) <a href="/models/DLA%20SimpleExtension1.nlogo" class="model-download-link small">Probablistic Sticking</a><br/>(2) <a href="/models/DLASimpleExtension1.nlogo" class="model-download-link small">Probablistic Sticking Based on Density</a><br/> (3) <a href="/models/DLASimpleExtension3.nlogo" class="model-download-link small">Multiple Seeds</a> 
+            (1) <a href="/models/DLA%20SimpleExtension1.nlogo" class="model-download-link small">Probablistic Sticking</a><br/>(2) <a href="/models/DLASimpleExtension2.nlogo" class="model-download-link small">Probablistic Sticking Based on Density</a><br/> (3) <a href="/models/DLASimpleExtension3.nlogo" class="model-download-link small">Multiple Seeds</a> 
+          </div>
+
+        </div>
+      </div>
+
+      <div class="model-container">
+        <div class="model-image-wrapper">
+          <img class="model-image" src="models/images/SegregationSimple.png">
+        </div>
+        <div class="model-description">
+          <div class="model-name">Segregation Simple<span class="model-page"> (p. 128)</span></div>
+          This project models the behavior of two types of turtles in a mythical pond. The red turtles and green turtles get along with one another. But each turtle wants to make sure that it lives near some of “its own.” That is, each red turtle wants to live near at least some red turtles, and each green turtle wants to live near at least some green turtles. The simulation shows how these individual preferences ripple through the pond, leading to large-scale patterns. This project was inspired by Thomas Schelling’s writings about social systems (particularly with regards to housing segregation in cities).
+          <div style="padding-top:8px;">
+            <a href="/models/SegregationSimple.nlogo" class="model-download-link">Download Segregation Simple Model</a>
+          </div>
+
+          <div style="padding-top:5px;">In this chapter we make three extensions to the Segregation Simple model:<br/>
+            (1) <a href="/models/SegregationSimpleExtension1.nlogo" class="model-download-link small">More than 2 Ethnicities</a><br/>(2) <a href="/models/SegregationSimpleExtension2.nlogo" class="model-download-link small">Individual Similiarity Preferences</a><br/> (3) <a href="/models/SegregationSimpleExtension3.nlogo" class="model-download-link small">Minimum Similarity Preferences</a> 
           </div>
 
         </div>
@@ -145,14 +183,14 @@
           <img class="model-image" src="models/images/ElFarol.png">
         </div>
         <div class="model-description">
-          <div class="model-name">El Farol<span class="model-page">(p. 22)</span></div>
+          <div class="model-name">El Farol<span class="model-page"> (p. 141)</span></div>
           El Farol is a bar in Santa Fe, New Mexico. The bar is popular — especially on Thursday nights when they offer Irish music — but sometimes becomes overcrowded and unpleasant. In fact, if the patrons of the bar think it will be overcrowded they stay home; otherwise they go enjoy themselves at El Farol. This model explores what happens to the overall attendance at the bar on these popular Thursday evenings, as the patrons use different strategies for determining how crowded they think the bar will be.
           <div style="padding-top:8px;">
             <a href="/models/ElFarol.nlogo" class="model-download-link">Download El Farol Model</a>
           </div>
 
           <div style="padding-top:5px;">In this chapter we make three extensions to the El Farol model:<br/>
-            (1) <a href="/models/ElFarolExtension1.nlogo" class="model-download-link small">Agent Shading by Frequency</a><br/>(2) <a href="/models/ElFarolExtension1.nlogo" class="model-download-link small">Additional Monitors</a><br/>(3) <a href="/models/ElFarolExtension3.nlogo" class="model-download-link small">Histogram Tracking Reward Values</a> 
+            (1) <a href="/models/ElFarolExtension1.nlogo" class="model-download-link small">Agent Shading by Frequency</a><br/>(2) <a href="/models/ElFarolExtension2.nlogo" class="model-download-link small">Additional Monitors</a><br/>(3) <a href="/models/ElFarolExtension3.nlogo" class="model-download-link small">Histogram Tracking Reward Values</a> 
           </div>
 
         </div>
@@ -162,6 +200,24 @@
     </div>
     <div>
       <div class="chapter-label"><h2><a id="ch4">Chapter 4 - Creating Agent-Based Models</a></h2></div>
+
+      <div class="model-container">
+        <div class="model-image-wrapper">
+          <img class="model-image" src="models/images/WolfSheepSimple.png">
+        </div>
+        <div class="model-description">
+          <div class="model-name">Building the Wolf-Sheep Predation Model<span class="model-page"> (p. 141)</span></div>
+          In this chapter we incrementaly build a preditor-prey model of population dynamics. Each version adds a new component to the model.
+          <div style="padding-top:8px;">
+              (1) <a href="/models/WolfSheepSimple1.nlogo" class="model-download-link small">Introducing Sheep</a><br/>
+              (2) <a href="/models/WolfSheepSimple2.nlogo" class="model-download-link small">Giving Sheep Energy</a><br/>
+              (3) <a href="/models/WolfSheepSimple3.nlogo" class="model-download-link small">Adding Grass</a><br/>
+              (4) <a href="/models/WolfSheepSimple4.nlogo" class="model-download-link small">Sheep now Reproduce</a><br/>
+              (5) <a href="/models/WolfSheepSimple5.nlogo" class="model-download-link small">Introducing Wolves</a><br/>
+          </div>
+        </div>
+      </div>
+
     </div>
     <div>
       <div class="chapter-label"><h2><a id="ch5">Chapter 5 - The Components of Agent-Based Modeling</a></h2></div>
