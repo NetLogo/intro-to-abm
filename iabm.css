@@ -1,277 +1,281 @@
-	* {
-		font-family: 'PT Sans', Helvetica, Arial, sans-serif;
-		line-height: 21px;
-	}
+* {
+  font-family: 'PT Sans', Helvetica, Arial, sans-serif;
+  line-height: 21px;
+}
 
-	h1 {
-	    font-family: 'Arvo', Georgia, Times, serif;
-	    font-size: 36;
-	    line-height: 25px;
-	}	
+h1 {
+  font-family: 'Arvo', Georgia, Times, serif;
+  font-size: 36;
+  line-height: 25px;
+}
 
-	h2 {
-	    font-family: 'Arvo', Georgia, Times, serif;
-	    font-size: 24px;
-	    line-height: 20px;
-	}	
+h2 {
+  font-family: 'Arvo', Georgia, Times, serif;
+  font-size: 24px;
+  line-height: 20px;
+}
 
-	h3, .model-name {
-	    font-family: 'Arvo', Georgia, Times, serif;
-	    font-size: 19px;
-	    line-height: 10px;
-	}	
+h3, .model-name {
+  font-family: 'Arvo', Georgia, Times, serif;
+  font-size: 19px;
+  line-height: 10px;
+}
 
-	p {
-	    font-family: 'PT Sans', Helvetica, Arial, sans-serif;
-	    font-size: 16px;
-	    line-height: 21px;
-			text-align: justify;
-	    text-justify: inter-word;
-	}
+p {
+  font-family: 'PT Sans', Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 21px;
+  text-align: justify;
+  text-justify: inter-word;
+}
 
-	a {
-		text-decoration: underline;
-		color: #b24926;
-	}
+a {
+  text-decoration: underline;
+  color: #b24926;
+}
 
-	a:hover {
-		color:#333;
-		text-decoration: none;
-		cursor: pointer;
-	}
+a:hover {
+  color:#333;
+  text-decoration: none;
+  cursor: pointer;
+}
 
-	.wrapper {
-	  display: -webkit-box;
-	  display: -moz-box;
-	  display: -ms-flexbox;
-	  display: -webkit-flex;
-	  display: flex;
-	  -webkit-flex-flow: row wrap;
-	  flex-flow: row wrap;
-	}
+pre {
+  font-family: monospace;
+}
 
-	.wrapper > * {
-	  flex: 8 100%;
-	}
+.wrapper {
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-flex-flow: row wrap;
+  flex-flow: row wrap;
+}
 
-	.header {
-	  /*background: tomato;*/
-	}
+.wrapper > * {
+  flex: 8 100%;
+}
 
-	.footer {
-	  /*background: lightgreen;*/
-	}
+.header {
+  /*background: tomato;*/
+}
 
-	.main {
-	  /*background: deepskyblue;*/
-	}
+.footer {
+  /*background: lightgreen;*/
+}
 
-	.aside-1 {
-	  /*background: gold;*/
-	}
+.main {
+  /*background: deepskyblue;*/
+}
 
-	.aside-2 {
-	  /*background: hotpink;*/
-	}
+.aside-1 {
+  /*background: gold;*/
+}
 
-	@media all and (min-width: 600px) {
-	  .aside { flex: 1 auto; }
-	}
+.aside-2 {
+  /*background: hotpink;*/
+}
 
-	@media all and (min-width: 800px) {
-	  .main    { flex: 8 1px; }
-	  .aside-1 { order: 1; } 
-	  .main    { order: 2; }
-	  .aside-2 { order: 3; }
-	  .footer  { order: 4; }
-	}
+@media all and (min-width: 600px) {
+  .aside { flex: 1 auto; }
+}
 
-	nav {
-	  mask-image: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, #ffffff 25%, #ffffff 75%, rgba(255, 255, 255, 0) 100%);
-	  margin-left: auto;
-	    margin-right: auto;
-	    margin-top: -22px;
-	    width: 100%;
-	    background-image: url("images/nav-background.jpg");
-	    background-size: 100% 100%;
-	    background-repeat: no-repeat;
-	}
+@media all and (min-width: 800px) {
+  .main    { flex: 8 1px; }
+  .aside-1 { order: 1; }
+  .main    { order: 2; }
+  .aside-2 { order: 3; }
+  .footer  { order: 4; }
+}
 
-	nav ul {
-	  text-align: center;
-	  background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 100%);
-	  box-shadow: 0 0 25px rgba(0, 0, 0, 0.1), inset 0 0 1px rgba(255, 255, 255, 0.6);
-	  margin-top: 16px;
-	  margin-bottom: 0px;
-	}
+nav {
+  mask-image: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, #ffffff 25%, #ffffff 75%, rgba(255, 255, 255, 0) 100%);
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: -22px;
+  width: 100%;
+  background-image: url("images/nav-background.jpg");
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+}
 
-	nav ul li {
-	  display: inline-block;
-	}
+nav ul {
+  text-align: center;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.2) 25%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0) 100%);
+  box-shadow: 0 0 25px rgba(0, 0, 0, 0.1), inset 0 0 1px rgba(255, 255, 255, 0.6);
+  margin-top: 16px;
+  margin-bottom: 0px;
+}
 
-	nav ul li a {
-	  padding: 20px;
-	  font-family: "Roboto";
-	  color: rgba(0, 0, 0, 0.5);
-	  text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.4);
-	  font-size: 20px;
-	  text-decoration: none;
-	  display: block;
-	}
+nav ul li {
+  display: inline-block;
+}
 
-	nav ul li a:hover {
-	  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1), inset 0 0 1px rgba(255, 255, 255, 0.6);
-	  background: rgba(255, 255, 255, 0.1);
-	  color: rgba(0, 0, 0, 0.7);
-	}
+nav ul li a {
+  padding: 20px;
+  font-family: "Roboto";
+  color: rgba(0, 0, 0, 0.5);
+  text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.4);
+  font-size: 20px;
+  text-decoration: none;
+  display: block;
+}
 
-	.author-image {
-		height:200px;
-		width:150px;
-		border: 1px solid #cccccc;
-		padding:4px;
-	}
+nav ul li a:hover {
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1), inset 0 0 1px rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(0, 0, 0, 0.7);
+}
 
-	.text-only-content {
-		padding:11px;
-	}
+.author-image {
+  height:200px;
+  width:150px;
+  border: 1px solid #cccccc;
+  padding:4px;
+}
 
-	/*blockquote:before {*/
-	.quote {
-	    color: #c4bda2;
-	    content: open-quote;
-	    font-size: 4em;
-	    line-height: 0.1em;
-	    vertical-align: -0.4em;
-	    font-family: "Georgia,​Cambria"
-	}
-	
-	.quote-body {
-	  font-family: "Times New Roman";
-		font-size: 14px;
-		margin: 0px;
-		font-style: italic;
-		line-height: 18px;
-	}
+.text-only-content {
+  padding:11px;
+}
 
-	.quote-source {
-		text-align:end;
-		font-size:14px;
-	}
+/*blockquote:before {*/
+.quote {
+  color: #c4bda2;
+  content: open-quote;
+  font-size: 4em;
+  line-height: 0.1em;
+  vertical-align: -0.4em;
+  font-family: "Georgia,​Cambria"
+}
 
-/***	NetLogo Models Page 	***/
-	#modelsPage a {
-		text-decoration: none;
-		color:#333;
-	}
+.quote-body {
+  font-family: "Times New Roman";
+  font-size: 14px;
+  margin: 0px;
+  font-style: italic;
+  line-height: 18px;
+}
 
-  #top-menu {
-      /*position: fixed;*/
-      z-index: 1;
-      background: white;
-      left: 0;
-      right: 0;
-      top: 0;
-      list-style: none;
-      /*padding-left:11%;*/
-      margin-top:0px;
-  }
+.quote-source {
+  text-align:end;
+  font-size:14px;
+}
 
-  #top-menu li {
-      float: left;
-  }
+/***    NetLogo Models Page     ***/
+#modelsPage a {
+  text-decoration: none;
+  color:#333;
+}
 
-  #top-menu a {
-      display: block;
-      padding: 5px 23px 7px 23px;
-      width: 3em;
-      text-align: center;
-      -webkit-transition: .5s all ease-out;
-      -moz-transition: .5s all ease-out;
-      transition: .5s all ease-out;
-      border-top: 3px solid white;
-      color: #aaa;
-      text-decoration: none;
-  }
+#top-menu {
+  /*position: fixed;*/
+  z-index: 1;
+  background: white;
+  left: 0;
+  right: 0;
+  top: 0;
+  list-style: none;
+  /*padding-left:11%;*/
+  margin-top:0px;
+}
 
-  #top-menu a:hover {
-      color: #000;
-  }
+#top-menu li {
+  float: left;
+}
 
-  #top-menu li.active a {
-      border-top: 3px solid #333;
-      color: #333;
-  }
+#top-menu a {
+  display: block;
+  padding: 5px 23px 7px 23px;
+  width: 3em;
+  text-align: center;
+  -webkit-transition: .5s all ease-out;
+  -moz-transition: .5s all ease-out;
+  transition: .5s all ease-out;
+  border-top: 3px solid white;
+  color: #aaa;
+  text-decoration: none;
+}
 
-  .model-container {
-    display: -webkit-flex;
-    display: flex;
-    align-content: space-between;
-    padding-bottom: 2%;
-    padding-right: 4%;
-    padding-left: 2%;
-  }
+#top-menu a:hover {
+  color: #000;
+}
 
-  .model-image-wrapper {
-  	width:33%;
-  }
+#top-menu li.active a {
+  border-top: 3px solid #333;
+  color: #333;
+}
 
-  .model-image {
-  	width:100%;
-    order:1;
-    box-shadow: 5px 5px 10px #888888;
-  }
+.model-container {
+  display: -webkit-flex;
+  display: flex;
+  align-content: space-between;
+  padding-bottom: 2%;
+  padding-right: 4%;
+  padding-left: 2%;
+}
 
-  .model-name {
-    margin-top:0px;
-  }
+.model-image-wrapper {
+  width:33%;
+}
 
-  .model-description {
-    diplay:-webkit-item;
-    diplay:item;
-    order:2;
-    padding-left:16px;
-    padding-top:5px;
-    width:100%;
-  }
+.model-image {
+  width:100%;
+  order:1;
+  box-shadow: 5px 5px 10px #888888;
+}
 
-  .model-page {
-  	font-size:11px;
-  	font-family: 'PT Sans', Helvetica, Arial, sans-serif;
-  }
+.model-name {
+  margin-top:0px;
+}
 
-  #modelsPage .model-download-link{
-  	font-size:15px; 
-  	vertical-align: text-bottom;
-  	color: #b24926;
-  	background: url('images/download-orange.png');
-		background-size: 20px;
-		background-repeat: no-repeat;
-		background-position: 0px 0px;
-		padding-left: 22px;
-		padding-top: 5px;
-  }
+.model-description {
+  diplay:-webkit-item;
+  diplay:item;
+  order:2;
+  padding-left:16px;
+  padding-top:5px;
+  width:100%;
+}
 
-  #modelsPage .model-download-link:hover {
-  	color: #333;
-  	background: url('images/download.png');
-		background-size: 20px;
-		background-repeat: no-repeat;
-		background-position: 0px 0px;
-		padding-top: 5px;
-  }
+.model-page {
+  font-size:11px;
+  font-family: 'PT Sans', Helvetica, Arial, sans-serif;
+}
 
-  #modelsPage .small{
-  	font-size:13px; 
-		background-size: 16px;
-		padding-top: 3px;
-		padding-left: 17px;
-		vertical-align: text-top;
-  }
+#modelsPage .model-download-link{
+  font-size:15px;
+  vertical-align: text-bottom;
+  color: #b24926;
+  background: url('images/download-orange.png');
+  background-size: 20px;
+  background-repeat: no-repeat;
+  background-position: 0px 0px;
+  padding-left: 22px;
+  padding-top: 5px;
+}
 
-  #modelsPage .small:hover {
-		background-size: 16px;
-		padding-top: 3px;
-		padding-left: 17px;
-		vertical-align: text-top;
-  }
+#modelsPage .model-download-link:hover {
+  color: #333;
+  background: url('images/download.png');
+  background-size: 20px;
+  background-repeat: no-repeat;
+  background-position: 0px 0px;
+  padding-top: 5px;
+}
+
+#modelsPage .small{
+  font-size:13px;
+  background-size: 16px;
+  padding-top: 3px;
+  padding-left: 17px;
+  vertical-align: text-top;
+}
+
+#modelsPage .small:hover {
+  background-size: 16px;
+  padding-top: 3px;
+  padding-left: 17px;
+  vertical-align: text-top;
+}

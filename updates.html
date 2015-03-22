@@ -94,7 +94,7 @@
 
     <li>
       On page 400, the code for the setup procedure of the Sandpile Simple model is shown as follows:
-      <pre style='font-family: monospace;'>
+      <pre>
       to setup [setup-task]
         clear-all
         ask patches [
@@ -110,7 +110,7 @@
 
       It should actually be:
 
-      <pre style='font-family: monospace;'>
+      <pre>
       to setup [setup-task]
         clear-all
         ask patches [
@@ -142,7 +142,7 @@
         <br/>
         If you have a Facebook account, go to <a href='http://snacourse.com/getnet/'>http://snacourse.com/getnet/</a> and follow the instructions for downloading your network. After completing step 2, GetNet will assemble your personal Facebook network and give you the option to download it as a GML file. Go ahead and do this. Next, open the GML file in a text editor such as Notepad (on Windows) or TextEdit (on OS X). You will see entries that look like the following:
 
-        <pre style='font-family: monospace;'>
+        <pre>
         node [
           id 1
           label "Jane Smith"
@@ -155,12 +155,12 @@
 
         Next, create a new NetLogo model. In order for NetLogo to import the node attributes in the GML file, you must declare them as turtle variables. For the above node to be fully imported, this looks like:
 
-        <pre style='font-family: monospace;'>
+        <pre>
         turtles-own [ id sex wallcount ]</pre>
 
         Remember, LABEL is a built-in turtle variable and so does not need to be declared. Once you have done that, loading your network is just one command
 
-        <pre style='font-family: monospace;'>
+        <pre>
         nw:load-gml “/path/to/your/network.graphml” turtles links</pre>
 
         This will create a turtle for each of your friends and the links between them. Now it is time to play with your friends! Can you visualize your network better by using layout-spring? It's very likely that your network will naturally cluster into several groups. By examining the turtle labels in these groups, can you figure out what each group corresponds to? Can you figure out which of your friends are most central by using centrality measures available in the network extension? (See <a href='http://ccl.northwestern.edu/netlogo/docs/nw.html'>http://ccl.northwestern.edu/netlogo/docs/nw.html</a> for documentation.)
