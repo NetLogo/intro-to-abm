@@ -244,7 +244,7 @@ nav ul li a:hover {
   font-family: 'PT Sans', Helvetica, Arial, sans-serif;
 }
 
-#modelsPage .model-download-link{
+#modelsPage .model-download-link, .model-download-link{
   font-size:15px;
   vertical-align: text-bottom;
   color: #b24926;
@@ -256,7 +256,7 @@ nav ul li a:hover {
   padding-top: 5px;
 }
 
-#modelsPage .model-download-link:hover {
+#modelsPage .model-download-link:hover, .model-download-link:hover {
   color: #333;
   background: url('images/download.png');
   background-size: 20px;
