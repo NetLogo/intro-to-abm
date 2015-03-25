@@ -58,25 +58,11 @@ pre {
   flex: 8 100%;
 }
 
-.header {
-  /*background: tomato;*/
-}
-
-.footer {
-  /*background: lightgreen;*/
-}
-
-.main {
-  /*background: deepskyblue;*/
-}
-
-.aside-1 {
-  /*background: gold;*/
-}
-
-.aside-2 {
-  /*background: hotpink;*/
-}
+.header {}
+.footer {}
+.main {}
+.aside-1 {}
+.aside-2 {}
 
 @media all and (min-width: 600px) {
   .aside { flex: 1 auto; }
@@ -127,6 +113,35 @@ nav ul li a:hover {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1), inset 0 0 1px rgba(255, 255, 255, 0.6);
   background: rgba(255, 255, 255, 0.1);
   color: rgba(0, 0, 0, 0.7);
+}
+
+.news {
+	border: dashed 1px black; 
+	padding: 0 15px 23px 15px; 
+	margin-top:16px;
+	max-height: 200px;
+	overflow: auto;
+}
+
+.news-entry {
+	display: -webkit-flex;
+	display:flex;
+	font-size: 14px;
+	padding: 3px 0;
+}
+
+.news .date {
+	font-style: italic;
+	width: 88px;
+}
+
+.news .date:after {
+	content: ": ";
+}
+
+.news .content {
+	text-align: left;
+	width: 100%;
 }
 
 .author-image {
