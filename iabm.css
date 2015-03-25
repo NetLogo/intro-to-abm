@@ -116,7 +116,9 @@ nav ul li a:hover {
 }
 
 .news {
-	border: dashed 1px black; 
+	border: 1.5px ridge indianred;
+	box-shadow: 2px 2px 4px darkred;
+	/*border: dashed 1px black; */
 	padding: 0 15px 23px 15px; 
 	margin-top:16px;
 	max-height: 200px;
