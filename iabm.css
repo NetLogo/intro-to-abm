@@ -295,3 +295,24 @@ nav ul li a:hover {
   padding-left: 17px;
   vertical-align: text-top;
 }
+/*
+#updates ul {
+  list-style-image: url(images/turtle-bullet.png);
+}
+*/
+#updates ul
+{
+	list-style-type: none;
+	padding: 0;
+	margin: 0;
+}
+
+#updates li
+{
+	background-image: url("images/turtle-bullet.png");
+  background-position: 0 0.4em;
+  background-repeat: no-repeat;
+  background-size: 15px auto;
+  padding-left: 22px;
+  padding-top: 3px;
+}
