@@ -1,42 +1,96 @@
-turtles-own [wealth]
+;; turtles have a strategy
+turtles-own [ strategy ]
+
+;; we need to keep track of the goal and what operators and inputs the agents can use
+globals [ goal operators inputs ]
 
 to setup
   clear-all
-  create-turtles 500 [
-    set wealth 100
-    set shape "circle"
-    set color green
-    set size 2 
+  set operators ["+ " "- " "* "]  ;; set up the usable operators
+  set inputs ["heading " "xcor " "1 " "2 " "10 "]  ;; set up the usable inputs
 
-  ;;  visualize the turtles from left to right in ascending order of wealth 
-    setxy wealth random-ycor 
+  ;; create the first generation of turtles and have them put their pens down
+  ;;   so we can see them when they draw
+  create-turtles 20 [
+    set strategy random-strategy
   ]
+
+  ;; set the goal to the upper right corner
+  set goal patch max-pxcor max-pycor
   reset-ticks
 end
 
+;; create a new strategy of how to set the heading for each turtle
+to-report random-strategy
+  ;; each strategy starts consists of 5 inputs and 4 operators alternating
+  let strat (list one-of inputs)
+  repeat 5 [ set strat (sentence strat one-of operators one-of inputs) ]
+  report strat
+end
 
 to go
-  ;; transact and then update your location
-  ask turtles with [wealth > 0] [transact]
-  ;; prevent wealthy turtles from moving too far to the right
-  ask turtles [if wealth <= max-pxcor [set xcor wealth] ]
+  if ticks > 0 [
+    ;; kill off 75% of the turtles with the least fitness (maximum distance)
+    let number-to-replace round (0.75 * count turtles)  ;; kill of 15 turtles assuming we started with 20
+    ask min-n-of number-to-replace turtles [ fitness ] [
+      die
+    ]
+    ;; hatch new mutant turtles
+    let best-turtles turtle-set turtles  ;; need this so that best-turtles is not the special turtles agentset and would expand
+    repeat number-to-replace [
+      ask one-of best-turtles [
+        hatch 1 [
+          set strategy mutate strategy
+          set color one-of base-colors ;; pick a NetLogo primary color to differentiate this turtle from its parent
+        ]
+      ]
+    ]
+  ]
+  clear-drawing ;; clear the trails of the killed turtles
+  ask turtles [
+    reset-positions  ;; send all the turtles back to the center of the world
+  ]
+  ask turtles [
+    ;; each turtle runs its strategy and moves forward 25 times
+    repeat 25 [
+      set heading run-result reduce word strategy
+      fd 1
+    ]
+    set label precision fitness 2  ;; visualize the fitness of each turtle
+  ]
   tick
 end
 
-to transact
-  ;; give a dollar to another turtle
-  set wealth wealth - 1
-  ask one-of other turtles [set wealth wealth + 1]
+;; mutate a strategy by replacing one of its inputs or one of its operators
+to-report mutate [strat]
+  ifelse random 2 = 0
+    [ set strat replace-item (2 * random 6) strat one-of inputs ]
+    [ set strat replace-item (1 + 2 * random 5) strat one-of operators ]
+  report strat
+end
+
+;; turtle procedure, set position to origin with random heading
+to reset-positions
+  home
+  set heading random 360
+  pen-down  ;; put the pen down to draw the turtle's movement
+end
+
+;; The greater the distance a turtle is to the goal, the smaller the fitness
+;; of the turtle. Using this formula, a turtle that reaches the goal has a
+;; fitness of zero. Turtles that don't reach the goal have a negative fitness.
+to-report fitness  ;; turtle procedure
+  report distance goal * -1
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-233
+303
+10
+742
+470
 16
-744
-128
--1
--1
-1.0
+16
+13.0
 1
 10
 1
@@ -46,10 +100,10 @@ GRAPHICS-WINDOW
 0
 0
 1
-0
-500
-0
-80
+-16
+16
+-16
+16
 1
 1
 1
@@ -57,12 +111,12 @@ ticks
 30.0
 
 BUTTON
-7
-46
-96
-79
+100
+65
+190
+98
 NIL
-setup\n
+setup
 NIL
 1
 T
@@ -74,10 +128,10 @@ NIL
 1
 
 BUTTON
-112
-46
-197
-79
+100
+120
+190
+153
 NIL
 go
 T
@@ -90,139 +144,92 @@ NIL
 NIL
 0
 
-PLOT
-229
-143
-744
-300
-wealth distribution
-NIL
-NIL
-0.0
-500.0
-0.0
-40.0
-false
-false
-"" ""
-PENS
-"current" 5.0 1 -10899396 true "" "histogram [wealth] of turtles"
-
 MONITOR
-599
+100
+210
+190
+255
+best fitness
+max [fitness] of turtles
+1
+1
+11
+
+PLOT
+5
+275
+297
 425
-744
-470
-wealth of bottom 50%
-sum [wealth] of min-n-of 250 turtles [wealth]
-1
-1
-11
-
-MONITOR
-608
-365
-728
-410
-wealth of top 10%
-sum [wealth] of max-n-of 50 turtles [wealth]
-1
-1
-11
-
-TEXTBOX
-563
-176
-679
-206
-Total wealth = $50,000
-11
-0.0
-1
-
-PLOT
-229
-332
-563
-482
-wealth by percent
-NIL
-NIL
+Average Fitness vs. Time
+ticks
+fitness
 0.0
 10.0
 0.0
-10000.0
+0.0
 true
-true
+false
 "" ""
 PENS
-"top-10%" 1.0 0 -2674135 true "" "plot sum [wealth] of max-n-of 50 turtles [wealth]"
-"bottom-50%" 1.0 0 -13345367 true "" "plot sum [wealth] of min-n-of 250 turtles [wealth]"
+"avg-fitness" 1.0 0 -16777216 true "" "plot mean [fitness] of turtles"
 
 @#$#@#$#@
 ## ACKNOWLEDGEMENT
 
-This model is from Chapter Two of the book "Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo", by Uri Wilensky & William Rand.
+This model is from Chapter Eight of the book "Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo", by Uri Wilensky & William Rand.
 
-Wilensky, U & Rand, W. (2015). Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo. Cambridge, Ma. MIT Press.
+Wilensky, U. & Rand, W. (2015). Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo. Cambridge, Ma. MIT Press.
 
 This model is in the IABM Textbook folder of the NetLogo models library. The model, as well as any updates to the model, can also be found on the textbook website: http://intro-to-abm.com.
 
 ## WHAT IS IT?
 
-This model is a very simple model of economic exchange.  It is a thought experiment of  a world where, in every time step, each person gives one dollar to one other person (at random) if they have any money to give.  If they have no money then they do not give out any money.
+This model illustrates how to integrate machine learning with agent-based modeling. The model creates a set of turtles whose goal is to get to the upper right corner of the world. The turtles start with random strategies, but the model then uses an evolutionary approach they improve their strategies over time to reach this corner.
+
 
 ## HOW IT WORKS
 
-The SETUP for the model creates 500 agents, and then gives them each 100 dollars.  At each tick, they give one dollar to another agent if they can.  If they have no money then they do nothing. Each agent also moves to an x-coordinate equal to its wealth.
+The model initially creates 20 agents and a list of inputs, such as `HEADING` and `XCOR`, and operators, such as `+`, `-`, etc. It then sets the strategy for each of the agents to a random set of five input / operator combinations. Each strategy results in the turtle changing its heading. When the model runs, each agent executes their strategy twenty five times, moves forward 1 after execution of its strategy, and measures its fitness. On the basis of this measurement, the worst 75% of the turtles in terms of performance are killed and replaced by mutated copies of the top performing 25%. This process is then repeated.
+
 
 ## HOW TO USE IT
 
-Press SETUP to setup the model, then press GO to watch the model develop.
+Press SETUP to create the agents and strategies.
+
+Press GO to run the agent strategies and see their evolution over time time.
+
+The BEST FITNESS monitor shows the maximum fitness for agents in the current generation. Fitness is defined here as the distance between the turtle and its goal, expressed as a negative value: the closer this value is to zero, the closer the turtle is to the goal, and thus, the more "fit" it is.
+
+The AVERAGE FITNESS VS. TIME plot shows the evolution of the average fitness of the whole population, which should increase over time.
+
 
 ## THINGS TO NOTICE
 
-Examine the various graphs and see how the model unfolds. Let it run for many ticks. The WEALTH DISTRIBUTION graph will change shape dramatically as time goes on. What happens to the WEALTH BY PERCENT graph over time?
+Do all the agents do the same thing? Can you tell the difference between the different strategies? Do you understand how inputs and operators combine to produce a heading for the turtle?
 
-## THINGS TO TRY
-Try running the model for many thousands of ticks. Does the distribution stabilize? How can you measure stabilization? Keep track of some individual agents. How do they move?
+Do the best turtles reach their goal? Do they reach it _exactly_? If they don't succeed in achieving a distance of zero, why do you think that is? Is there any modification that you could make to the model to allow such a result to be achieved?
+
+Do the strategies seem to converge over time? You should notice that, even when they do, there is still some variation in the population because mutations are introduced with each new generation.
+
+Finally, have you noticed that not every run of the model produces the same "best fitness". Sometimes, the population gets stuck in what we call a "local maximum". This happens when the best turtles in the population have sub-optimal fitness, but every single mutation their offsprings can have actually makes them worse. To reach the "global maximum", they would need many successive mutations, but the current model does not allow that: turtles that are worse then their parent get eliminated right away.
 
 
 ## EXTENDING THE MODEL
-Change the number of turtles.  Does this affect the results?
-Change the rules so agents can go into debt. Does this affect the results?
-Change the basic transaction rule of the model.  What happens if the turtles exchange more than one dollar? How about if they give a random amount to another agent at each tick? Change the rules so that the richer agents have a better chance of being given money? Or a smaller chance? How does this change the results?
+
+Change the list of inputs and operators and see how that affects the results of the model. Can you find a combination of inputs and operators that allow the turtles to reach their goal exactly?
+
+Think about the "local maximum" problem mentioned in the previous section. Can you think of a way out of it? In the current model, only the best 25% of turtles get to reproduce, but maybe this does not have to be the case. Do you think it could be helpful to give other turtles a small chance to reproduce as well?
+
 
 ## NETLOGO FEATURES
 
-This model makes extensive use of the "widget" based graph methods.
+This model uses the NetLogo's [`runresult`](http://ccl.northwestern.edu/netlogo/docs/dictionary.html#runresult) primitive, which allows you to execute a piece code stored in a string and report its result.
 
-## RELATED MODELS
+Our strategies are not directly stored as strings, however: they are stored as _lists_ of strings. To turn a strategy into a single string that can be handled by `runresult`, we use the [`reduce`](http://ccl.northwestern.edu/netlogo/docs/dictionary.html#reduce) primitive, which can turn a list of values into a single value by repeatedly applying a reporter to combine elements of the list. In this case, the reporter used is [`word`](http://ccl.northwestern.edu/netlogo/docs/dictionary.html#word), which simply concatenates the strings.
 
-This model is related to the WEALTH DISTRIBUTION model.
-
-## HOW TO CITE
-
-This model is part of the textbook, “Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo.”
-
-If you mention this model or the NetLogo software in a publication, we ask that you include the citations below.
-
-For the model itself:
-
-* Wilensky, U. (2011).  NetLogo Simple Economy model.  http://ccl.northwestern.edu/netlogo/models/IABMTextbook/SimpleEconomy.  Center for Connected Learning and Computer-Based Modeling, Northwestern University, Evanston, IL
-
-Please cite the NetLogo software as:
-
-* Wilensky, U. (1999). NetLogo. http://ccl.northwestern.edu/netlogo/. Center for Connected Learning and Computer-Based Modeling, Northwestern University, Evanston, IL.
-
-Please cite the textbook as:
-
-* Wilensky, U. & Rand, W. (2015). Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo. Cambridge, Ma. MIT Press.
+The `runresult` primitive can also be used with [tasks](http://ccl.northwestern.edu/netlogo/docs/programming.html#tasks) instead of strings. See the Sandpile model in the library for an example.
 
 ## CREDITS AND REFERENCES
-
-Models of this kind are described in: 
-Dragulescu, A. & V.M. Yakovenko, V.M. (2000).  Statistical Mechanics of Money. European Physics Journal B.
 @#$#@#$#@
 default
 true
@@ -416,6 +423,15 @@ Polygon -7500403 true true 135 105 90 60 45 45 75 105 135 135
 Polygon -7500403 true true 165 105 165 135 225 105 255 45 210 60
 Polygon -7500403 true true 135 90 120 45 150 15 180 45 165 90
 
+sheep
+false
+0
+Rectangle -7500403 true true 151 225 180 285
+Rectangle -7500403 true true 47 225 75 285
+Rectangle -7500403 true true 15 75 210 225
+Circle -7500403 true true 135 75 150
+Circle -16777216 true false 165 76 116
+
 square
 false
 0
@@ -525,5 +541,5 @@ Line -7500403 true 150 150 90 180
 Line -7500403 true 150 150 210 180
 
 @#$#@#$#@
-0
+1
 @#$#@#$#@

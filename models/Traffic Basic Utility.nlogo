@@ -1,55 +1,106 @@
-turtles-own [wealth]
+globals [ sample-car ]
+turtles-own [ speed speed-limit speed-min ]
 
 to setup
   clear-all
-  create-turtles 500 [
-    set wealth 100
-    set shape "circle"
-    set color green
-    set size 2 
-
-  ;;  visualize the turtles from left to right in ascending order of wealth 
-    setxy wealth random-ycor 
-  ]
+  ask patches [ setup-road ]
+  setup-cars
+  watch sample-car
   reset-ticks
 end
 
+to setup-road  ;; patch procedure
+  if (pycor < 2) and (pycor > -2) [ set pcolor white ]
+end
+
+to setup-cars
+  if number-of-cars > world-width
+  [
+    user-message (word "There are too many cars for the amount of road.  Please decrease the NUMBER-OF-CARS slider to below "
+                       (world-width + 1)
+                       " and press the SETUP button again.  The setup has stopped.")
+    stop
+  ]
+
+  set-default-shape turtles "car"
+  create-turtles number-of-cars [
+    set color blue
+    set xcor random-xcor
+    set heading  90
+    ;;; set initial speed to be in range 0.1 to 1.0
+    set speed  0.1 + random-float .9
+    set speed-limit  1
+    set speed-min  0
+    separate-cars
+  ]
+  set sample-car one-of turtles
+  ask sample-car [ set color red ]
+end
+
+; this procedure is needed so when we click "Setup" we
+; don't end up with any two cars on the same patch
+to separate-cars  ;; turtle procedure
+  if any? other turtles-here
+    [ fd 1
+      separate-cars ]
+end
 
 to go
-  ;; transact and then update your location
-  ask turtles with [wealth > 0] [transact]
-  ;; prevent wealthy turtles from moving too far to the right
-  ask turtles [if wealth <= max-pxcor [set xcor wealth] ]
+   ;; if there is a car right ahead of you, match its speed then slow down
+  ask turtles [
+    let car-ahead one-of turtles-on patch-ahead 1
+    ifelse car-ahead != nobody
+    [ slow-down-car car-ahead]
+    ;; otherwise, adjust speed to find ideal fuel efficiency
+    [ adjust-speed-for-efficiency ]
+    ;;; don't slow down below speed minimum or speed up beyond speed limit
+    if speed < speed-min  [ set speed speed-min ]
+    fd speed ]
   tick
 end
 
-to transact
-  ;; give a dollar to another turtle
-  set wealth wealth - 1
-  ask one-of other turtles [set wealth wealth + 1]
+;; turtle (car) procedure
+;; slow down so your speed is lower than the speed of the car ahead
+to slow-down-car [car-ahead] 
+  set speed [speed] of car-ahead - deceleration
+end
+
+;; turtle (car) procedure
+to speed-up-car  
+  set speed speed + acceleration
+end
+
+;; adjust speed to be closer to most efficient speed
+to adjust-speed-for-efficiency
+  if not (speed = efficient-speed) [
+    if (speed + acceleration < efficient-speed) [
+      set speed speed + acceleration ]
+    if (speed - deceleration > efficient-speed) [
+      set speed speed - deceleration ]
+  ]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-233
-16
-744
-128
--1
--1
-1.0
+26
+295
+699
+443
+25
+4
+13.0
 1
 10
 1
 1
 1
 0
-0
-0
 1
 0
-500
-0
-80
+1
+-25
+25
+-4
+4
 1
 1
 1
@@ -57,12 +108,12 @@ ticks
 30.0
 
 BUTTON
-7
-46
-96
-79
+36
+72
+108
+113
 NIL
-setup\n
+setup
 NIL
 1
 T
@@ -74,10 +125,10 @@ NIL
 1
 
 BUTTON
-112
-46
-197
-79
+119
+73
+190
+113
 NIL
 go
 T
@@ -90,126 +141,196 @@ NIL
 NIL
 0
 
-PLOT
-229
-143
-744
-300
-wealth distribution
+SLIDER
+12
+34
+216
+67
+number-of-cars
+number-of-cars
+1
+41
+20
+1
+1
 NIL
+HORIZONTAL
+
+SLIDER
+134
+182
+261
+215
+deceleration
+deceleration
+0
+.099
+0.027
+.001
+1
 NIL
-0.0
-500.0
-0.0
-40.0
-false
-false
-"" ""
-PENS
-"current" 5.0 1 -10899396 true "" "histogram [wealth] of turtles"
+HORIZONTAL
 
-MONITOR
-599
-425
-744
-470
-wealth of bottom 50%
-sum [wealth] of min-n-of 250 turtles [wealth]
+SLIDER
+134
+147
+261
+180
+acceleration
+acceleration
+0
+.0099
+0.0045
+.0001
 1
-1
-11
-
-MONITOR
-608
-365
-728
-410
-wealth of top 10%
-sum [wealth] of max-n-of 50 turtles [wealth]
-1
-1
-11
-
-TEXTBOX
-563
-176
-679
-206
-Total wealth = $50,000
-11
-0.0
-1
+NIL
+HORIZONTAL
 
 PLOT
-229
-332
-563
-482
-wealth by percent
-NIL
-NIL
+286
+20
+704
+217
+Car speeds
+time
+speed
 0.0
-10.0
+300.0
 0.0
-10000.0
+1.1
 true
 true
 "" ""
 PENS
-"top-10%" 1.0 0 -2674135 true "" "plot sum [wealth] of max-n-of 50 turtles [wealth]"
-"bottom-50%" 1.0 0 -13345367 true "" "plot sum [wealth] of min-n-of 250 turtles [wealth]"
+"red car" 1.0 0 -2674135 true "" "plot [speed] of sample-car"
+"min speed" 1.0 0 -13345367 true "" "plot min [speed] of turtles"
+"max speed" 1.0 0 -10899396 true "" "plot max [speed] of turtles"
+
+MONITOR
+17
+145
+114
+190
+red car speed
+  ifelse-value any? turtles\n  [   [speed] of sample-car  ]\n  [  0 ]
+3
+1
+11
+
+SLIDER
+79
+248
+264
+281
+efficient-speed
+efficient-speed
+0
+1
+0.5
+.01
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## ACKNOWLEDGEMENT
 
-This model is from Chapter Two of the book "Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo", by Uri Wilensky & William Rand.
+This model is from Chapter Five of the book "Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo", by Uri Wilensky & William Rand.
 
-Wilensky, U & Rand, W. (2015). Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo. Cambridge, Ma. MIT Press.
+Wilensky, U. & Rand, W. (2015). Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo. Cambridge, Ma. MIT Press.
 
 This model is in the IABM Textbook folder of the NetLogo models library. The model, as well as any updates to the model, can also be found on the textbook website: http://intro-to-abm.com.
 
 ## WHAT IS IT?
 
-This model is a very simple model of economic exchange.  It is a thought experiment of  a world where, in every time step, each person gives one dollar to one other person (at random) if they have any money to give.  If they have no money then they do not give out any money.
+This model models the movement of cars on a highway. Each car follows a simple set of rules: it slows down (decelerates) if it sees a car close ahead, and speeds up (accelerates) if it doesn't see a car ahead.
 
-## HOW IT WORKS
+Cars start at a random speed between 0.1 and 1 .
 
-The SETUP for the model creates 500 agents, and then gives them each 100 dollars.  At each tick, they give one dollar to another agent if they can.  If they have no money then they do nothing. Each agent also moves to an x-coordinate equal to its wealth.
+This model extends the Traffic Basic model, from the social science section of the NetLogo models library, to include a utility function for the cars. The model sets the optimal speed for the cars (best fuel efficiency) to be 0.45. If the acceleration rule speeds the car past the optimal speed, the car decelerates instead of accelerating.
 
 ## HOW TO USE IT
 
-Press SETUP to setup the model, then press GO to watch the model develop.
+Click on the SETUP button to set up the cars. Set the NUMBER slider to change the number of cars on the road.
+
+Click on GO to start the cars moving.  Note that they wrap around the world as they move, so the road is like a continuous loop.
+
+The ACCELERATION slider controls the rate at which cars accelerate (speed up) when there are no cars ahead.
+
+When a car sees another car right in front, it matches that car's speed and then slows down a bit more.  How much slower it goes than the car in front of it is controlled by the DECELERATION slider.
+
+The EFFICIENT-SPEED slider is the basis of the utility function for the cars. Cars slow down if they are exceeding it.
 
 ## THINGS TO NOTICE
+<b>From the Traffic Basic Model:</b>
 
-Examine the various graphs and see how the model unfolds. Let it run for many ticks. The WEALTH DISTRIBUTION graph will change shape dramatically as time goes on. What happens to the WEALTH BY PERCENT graph over time?
+Traffic jams can start from small "seeds."  These cars start with random positions and random speeds. If some cars are clustered together, they will move slowly, causing cars behind them to slow down, and a traffic jam forms.
+
+Even though all of the cars are moving forward, the traffic jams tend to move backwards. This behavior is common in wave phenomena: the behavior of the group is often very different from the behavior of the individuals that make up the group.
+
+The plot shows three values as the model runs:
+
+ * the fastest speed of any car (this doesn't exceed the speed limit!)
+ * the slowest speed of any car
+ * the speed of a single car (turtle 0), painted red so it can be watched.
+
+Notice not only the maximum and minimum, but also the variability -- the "jerkiness" of one vehicle.
+
+Notice that the default settings have cars decelerating much faster than they accelerate. This is typical of traffic flow models.
+
+Even though both ACCELERATION and DECELERATION are very small, the cars can achieve high speeds as these values are added or subtracted at each tick.
+
+<b>For this extended model that uses a utility function:</b>
+
+How are the results different form the Traffic Basic model?
+
+How does the model's behavior change with different values of EFFICIENT-SPEED?
 
 ## THINGS TO TRY
-Try running the model for many thousands of ticks. Does the distribution stabilize? How can you measure stabilization? Keep track of some individual agents. How do they move?
+
+In this model there are three variables that can affect the tendency to create traffic jams: the initial NUMBER of cars, ACCELERATION, and DECELERATION. Look for patterns in how the three settings affect the traffic flow.  Which variable has the greatest effect?  Do the patterns make sense?  Do they seem to be consistent with your driving experiences?
+
+Set DECELERATION to zero.  What happens to the flow?  Gradually increase DECELERATION while the model runs.  At what point does the flow "break down"?
+
+Try very low and very high values of EFFICIENT-SPEED-SPEED. Are there values where the model behavior changes qualitatively?
 
 
 ## EXTENDING THE MODEL
-Change the number of turtles.  Does this affect the results?
-Change the rules so agents can go into debt. Does this affect the results?
-Change the basic transaction rule of the model.  What happens if the turtles exchange more than one dollar? How about if they give a random amount to another agent at each tick? Change the rules so that the richer agents have a better chance of being given money? Or a smaller chance? How does this change the results?
+
+Try other rules for speeding up and slowing down.  Is the rule presented here realistic? Are there other rules that are more accurate or represent better driving strategies?
+
+In reality, different vehicles may follow different rules. Try giving different rules or ACCELERATION/DECELERATION values to some of the cars.  Can one bad driver mess things up?
+
+The asymmetry between acceleration and deceleration is a simplified representation of different driving habits and response times. Can you explicitly encode these into the model?
+
+What could you change to minimize the chances of traffic jams forming?
+
+What could you change to make traffic jams move forward rather than backward?
+
+Make a model of two-lane traffic.
 
 ## NETLOGO FEATURES
 
-This model makes extensive use of the "widget" based graph methods.
+The plot shows both global values and the value for a single turtle, which helps one watch overall patterns and individual behavior at the same time.
+
+The `watch` command is used to make it easier to focus on the red car.
 
 ## RELATED MODELS
 
-This model is related to the WEALTH DISTRIBUTION model.
+"Traffic Grid" adds a street grid with stoplights at the intersections.
+
+"Gridlock" (a HubNet model) is a participatory simulation version of Traffic Grid
+
 
 ## HOW TO CITE
 
-This model is part of the textbook, “Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo.”
+This model is part of the textbook, “Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems using NetLogo.”
 
 If you mention this model or the NetLogo software in a publication, we ask that you include the citations below.
 
 For the model itself:
 
-* Wilensky, U. (2011).  NetLogo Simple Economy model.  http://ccl.northwestern.edu/netlogo/models/IABMTextbook/SimpleEconomy.  Center for Connected Learning and Computer-Based Modeling, Northwestern University, Evanston, IL
+* Rand, W. & Wilensky, U. (2008). Traffic Basic Utility Model.  http://ccl.northwestern.edu/netlogo/models/IABMTextbook/TrafficBasicUtility.  Center for Connected Learning and Computer-Based Modeling, Northwestern University, Evanston, IL.
 
 Please cite the NetLogo software as:
 
@@ -217,12 +338,9 @@ Please cite the NetLogo software as:
 
 Please cite the textbook as:
 
-* Wilensky, U. & Rand, W. (2015). Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo. Cambridge, Ma. MIT Press.
+* Wilensky, U & Rand, W. (2015). Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo. Cambridge, Ma. MIT Press.
 
 ## CREDITS AND REFERENCES
-
-Models of this kind are described in: 
-Dragulescu, A. & V.M. Yakovenko, V.M. (2000).  Statistical Mechanics of Money. European Physics Journal B.
 @#$#@#$#@
 default
 true
@@ -509,6 +627,8 @@ Polygon -7500403 true true 30 75 75 30 270 225 225 270
 @#$#@#$#@
 NetLogo 5.2.0-RC4
 @#$#@#$#@
+setup
+repeat 180 [ go ]
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@

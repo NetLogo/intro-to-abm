@@ -1,42 +1,62 @@
-turtles-own [wealth]
+turtles-own [ friend enemy ]
 
 to setup
   clear-all
-  create-turtles 500 [
-    set wealth 100
-    set shape "circle"
-    set color green
-    set size 2 
+  ask patches [ set pcolor white ]  ;; create a blank background
+  create-turtles number [
+    setxy random-xcor random-ycor
 
-  ;;  visualize the turtles from left to right in ascending order of wealth 
-    setxy wealth random-ycor 
+    ;; set the turtle personalities based on chooser
+    if (personalities = "brave")     [ set color blue ]
+    if (personalities = "cowardly")  [ set color red ]
+    if (personalities = "mixed")     [ set color one-of [ red blue ] ]
+
+    ;; choose friend and enemy targets
+    set friend one-of other turtles
+    set enemy one-of other turtles
   ]
   reset-ticks
 end
 
-
 to go
-  ;; transact and then update your location
-  ask turtles with [wealth > 0] [transact]
-  ;; prevent wealthy turtles from moving too far to the right
-  ask turtles [if wealth <= max-pxcor [set xcor wealth] ]
+  ask turtles [
+    if (color = blue)  [ act-bravely ]
+    if (color = red)   [ act-cowardly ]
+  ]
   tick
 end
 
-to transact
-  ;; give a dollar to another turtle
-  set wealth wealth - 1
-  ask one-of other turtles [set wealth wealth + 1]
+to act-bravely
+  ;; move toward the midpoint of your friend and enemy
+  facexy ([xcor] of friend + [xcor] of enemy) / 2
+         ([ycor] of friend + [ycor] of enemy) / 2
+  fd 0.1
+end
+
+to act-cowardly
+  ;; put your friend between you and your enemy
+  facexy [xcor] of friend + ([xcor] of friend - [xcor] of enemy) / 2
+         [ycor] of friend + ([ycor] of friend - [ycor] of enemy) / 2
+  fd 0.1
+end
+
+to preset [ seed ]
+  ;; sets up the model for use with a particular random seed and constant
+  ;; model parameters, so that a particular pattern can be re-created.
+  set personalities "mixed"
+  set number 68
+  random-seed seed
+  setup
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-233
+290
+15
+729
+475
 16
-744
-128
--1
--1
-1.0
+16
+13.0
 1
 10
 1
@@ -46,23 +66,23 @@ GRAPHICS-WINDOW
 0
 0
 1
-0
-500
-0
-80
+-16
+16
+-16
+16
 1
 1
 1
 ticks
-30.0
+200.0
 
 BUTTON
-7
-46
-96
-79
+55
+125
+140
+158
 NIL
-setup\n
+setup
 NIL
 1
 T
@@ -74,10 +94,10 @@ NIL
 1
 
 BUTTON
-112
-46
-197
-79
+155
+125
+230
+158
 NIL
 go
 T
@@ -90,139 +110,263 @@ NIL
 NIL
 0
 
-PLOT
-229
-143
-744
-300
-wealth distribution
+CHOOSER
+55
+70
+230
+115
+personalities
+personalities
+"brave" "cowardly" "mixed"
+2
+
+SLIDER
+55
+30
+230
+63
+number
+number
+3
+200
+68
+1
+1
+NIL
+HORIZONTAL
+
+BUTTON
+150
+215
+275
+248
+frozen
+preset -1153988890\n
+NIL
+1
+T
+OBSERVER
 NIL
 NIL
-0.0
-500.0
-0.0
-40.0
-false
-false
-"" ""
-PENS
-"current" 5.0 1 -10899396 true "" "histogram [wealth] of turtles"
+NIL
+NIL
+1
 
-MONITOR
-599
-425
-744
-470
-wealth of bottom 50%
-sum [wealth] of min-n-of 250 turtles [wealth]
+BUTTON
+15
+215
+145
+248
+dot
+preset -1177467632\n
+NIL
 1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
 1
-11
 
-MONITOR
-608
-365
-728
-410
-wealth of top 10%
-sum [wealth] of max-n-of 50 turtles [wealth]
+BUTTON
+15
+255
+145
+288
+slinky
+preset -608717654\n
+NIL
 1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
 1
-11
+
+BUTTON
+150
+255
+275
+288
+spiral
+preset 1086013561\n
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+15
+335
+145
+368
+yo-yo
+preset -180308068\n
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
 
 TEXTBOX
-563
-176
-679
-206
-Total wealth = $50,000
-11
+20
+190
+265
+210
+Preset configurations - Press button, then GO.
+10
 0.0
 1
 
-PLOT
-229
-332
-563
-482
-wealth by percent
+BUTTON
+150
+335
+275
+368
+wandering flock
+preset 961107169\n
+NIL
+1
+T
+OBSERVER
 NIL
 NIL
-0.0
-10.0
-0.0
-10000.0
-true
-true
-"" ""
-PENS
-"top-10%" 1.0 0 -2674135 true "" "plot sum [wealth] of max-n-of 50 turtles [wealth]"
-"bottom-50%" 1.0 0 -13345367 true "" "plot sum [wealth] of min-n-of 250 turtles [wealth]"
+NIL
+NIL
+1
+
+BUTTON
+15
+380
+275
+413
+generally cool one that eventually stops
+preset 284529528\n
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+150
+295
+275
+328
+spiral 2
+preset 878469395\n
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+15
+295
+145
+328
+slinky 2
+preset -1315170766\n
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
 
 @#$#@#$#@
 ## ACKNOWLEDGEMENT
 
 This model is from Chapter Two of the book "Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo", by Uri Wilensky & William Rand.
 
-Wilensky, U & Rand, W. (2015). Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo. Cambridge, Ma. MIT Press.
+Wilensky, U. & Rand, W. (2015). Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo. Cambridge, Ma. MIT Press.
 
 This model is in the IABM Textbook folder of the NetLogo models library. The model, as well as any updates to the model, can also be found on the textbook website: http://intro-to-abm.com.
 
+## UPDATES TO THE MODEL SINCE TEXTBOOK PUBLICATION
+
+In the textbook version of the code, there is a slight chance that a turtle's friend is also its enemy. Here, we prevent this from happening by choosing the enemy of a turtle amongst the set of other turtles not including its friend.
+
+Also, we could not resist adding a few interesting preset configurations. Have fun playing with them!
+
 ## WHAT IS IT?
 
-This model is a very simple model of economic exchange.  It is a thought experiment of  a world where, in every time step, each person gives one dollar to one other person (at random) if they have any money to give.  If they have no money then they do not give out any money.
+The "Heroes and Cowards" game, also called the "Friends and Enemies" game or the "Aggressors and Defenders" game dates back to the Fratelli Theater Group at the 1999 Embracing Complexity conference, or perhaps earlier.
+
+In the human version of this game, each person arbitrarily chooses someone else in the room to be their perceived friend, and someone to be their perceived enemy.  They don't tell anyone who they have chosen, but they all move to position themselves either such that a) they are between their friend and their enemy (BRAVE/DEFENDING), or b) such that they are behind their friend relative to their enemy (COWARDLY/FLEEING).
+
+This simple model demonstrates an idealized form of this game played out by computational agents.  Mostly it demonstrates how rich, complex, and surprising behavior can emerge from simple rules and interactions.
 
 ## HOW IT WORKS
 
-The SETUP for the model creates 500 agents, and then gives them each 100 dollars.  At each tick, they give one dollar to another agent if they can.  If they have no money then they do nothing. Each agent also moves to an x-coordinate equal to its wealth.
+The rules of this model are that there are two basic personality types.  All agents in the model choose a friend and an enemy.  If their personality is BRAVE, then the agent tries to stay between their enemy and their friend, protecting their friend. If their personality is COWARDLY, then the agent tries to keep their friend between them and their enemy, hiding behind their friend.
 
 ## HOW TO USE IT
 
-Press SETUP to setup the model, then press GO to watch the model develop.
+Choose the NUMBER of turtles you want to examine, and choose whether the turtles should act COWARDLY, BRAVE, or MIXED.  Then press SETUP followed by GO to observe the patterns of behavior formed.
 
 ## THINGS TO NOTICE
 
-Examine the various graphs and see how the model unfolds. Let it run for many ticks. The WEALTH DISTRIBUTION graph will change shape dramatically as time goes on. What happens to the WEALTH BY PERCENT graph over time?
+Run the model many times and observe the different patterns of behavior.
+INSPECT or WATCH some turtles so that you can see their individual behavior.
 
 ## THINGS TO TRY
-Try running the model for many thousands of ticks. Does the distribution stabilize? How can you measure stabilization? Keep track of some individual agents. How do they move?
 
+Can you find new cool configurations with 68 turtles? How many different type can you find? What happens when you vary the number of turtles?
 
 ## EXTENDING THE MODEL
-Change the number of turtles.  Does this affect the results?
-Change the rules so agents can go into debt. Does this affect the results?
-Change the basic transaction rule of the model.  What happens if the turtles exchange more than one dollar? How about if they give a random amount to another agent at each tick? Change the rules so that the richer agents have a better chance of being given money? Or a smaller chance? How does this change the results?
+
+There is a bug we deliberately introduced in the SETUP of the model. Can you find it and fix it? Once you have fixed it, how does it affect the preset configurations?
+Can you find new presets?
+
+Modify the code to add more control over how many of each type of behavior there is.
+
+Change the world wrapping rules to see how that effects the results.
+
+You can create buttons that capture interesting patterns of behaviors by using the RANDOM-SEED function in NetLogo.  First set the RANDOM-SEED to different values. PRESS SETUP then GO and observe the behaviors. We created a `preset` procedure that makes it easy to create your own buttons that produce interesting behaviors. This procedure assumes a population of 68 turtles with "mixed" behaviors, but you could modify it to allow different settings. Create your own buttons that produce interesting behaviors.
 
 ## NETLOGO FEATURES
 
-This model makes extensive use of the "widget" based graph methods.
+RANDOM-SEED initializes the NetLogo random number generator so that it always produces the same set of random numbers, enabling exact reproduction of model runs.
 
-## RELATED MODELS
-
-This model is related to the WEALTH DISTRIBUTION model.
-
-## HOW TO CITE
-
-This model is part of the textbook, “Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo.”
-
-If you mention this model or the NetLogo software in a publication, we ask that you include the citations below.
-
-For the model itself:
-
-* Wilensky, U. (2011).  NetLogo Simple Economy model.  http://ccl.northwestern.edu/netlogo/models/IABMTextbook/SimpleEconomy.  Center for Connected Learning and Computer-Based Modeling, Northwestern University, Evanston, IL
-
-Please cite the NetLogo software as:
-
-* Wilensky, U. (1999). NetLogo. http://ccl.northwestern.edu/netlogo/. Center for Connected Learning and Computer-Based Modeling, Northwestern University, Evanston, IL.
-
-Please cite the textbook as:
-
-* Wilensky, U. & Rand, W. (2015). Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo. Cambridge, Ma. MIT Press.
 
 ## CREDITS AND REFERENCES
 
-Models of this kind are described in: 
-Dragulescu, A. & V.M. Yakovenko, V.M. (2000).  Statistical Mechanics of Money. European Physics Journal B.
+This model is part of the textbook: Wilensky & Rand (2015). Introduction to Agent-Based Modeling: Modeling the Natural, Social and Engineered Complex Systems with NetLogo.
+
+Versions of the Model are described in:
+
+Bonabeau, E., & Meyer, C. (2001). Swarm intelligence. A whole new way to think about business. Harvard Business Review, 5, 107-114.
+
+Bonabeau. E. (2012). http://www.icosystem.com/labsdemos/the-game/ .
+
+Bonabeau, E., Funes, P. & Orme, B.  (2003). Exploratory Design Of Swarms. 2nd International Workshop on the Mathematics and Algorithms of Social Insects. Georgia Institute of technology, Atlanta, GA.
+
+Sweeney, L. B., & Meadows, D. (2010). The systems thinking playbook: Exercises to stretch and build learning and systems thinking capabilities.
 @#$#@#$#@
 default
 true
@@ -525,5 +669,5 @@ Line -7500403 true 150 150 90 180
 Line -7500403 true 150 150 210 180
 
 @#$#@#$#@
-0
+1
 @#$#@#$#@

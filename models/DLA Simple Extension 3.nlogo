@@ -1,55 +1,55 @@
-turtles-own [wealth]
-
 to setup
   clear-all
-  create-turtles 500 [
-    set wealth 100
-    set shape "circle"
-    set color green
-    set size 2 
-
-  ;;  visualize the turtles from left to right in ascending order of wealth 
-    setxy wealth random-ycor 
-  ]
+  ;; start with NUM-SEEDS green patches as “seeds”
+  ask n-of num-seeds patches 
+    [ set pcolor green ]
+  create-turtles num-particles
+    [ set color red
+      set size 1.5 ;; easier to see
+      setxy random-xcor random-ycor ]
   reset-ticks
 end
 
-
-to go
-  ;; transact and then update your location
-  ask turtles with [wealth > 0] [transact]
-  ;; prevent wealthy turtles from moving too far to the right
-  ask turtles [if wealth <= max-pxcor [set xcor wealth] ]
+to go    
+  ask turtles
+  [ right random wiggle-angle
+    left random wiggle-angle
+    forward 1
+    let local-prob probability-of-sticking 
+ 
+    ;; if neighbor-influence is TRUE then make the probability proportionate to the number of green neighbors, otherwise use the slider as before
+    if neighbor-influence? [
+      ;; increase the probability of sticking the more green neighbors there are
+      set local-prob probability-of-sticking * (count neighbors with [ pcolor = green ] / 8)
+    ] 
+    if (pcolor = black) and ( any? neighbors with [pcolor = green] ) 
+          and ( random-float 1.0 < local-prob )
+      [ set pcolor green
+        die ] ]
   tick
-end
-
-to transact
-  ;; give a dollar to another turtle
-  set wealth wealth - 1
-  ask one-of other turtles [set wealth wealth + 1]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-233
-16
-744
-128
--1
--1
-1.0
+211
+10
+824
+644
+100
+100
+3.0
 1
 10
 1
 1
 1
 0
-0
-0
 1
-0
-500
-0
-80
+1
+1
+-100
+100
+-100
+100
 1
 1
 1
@@ -57,12 +57,12 @@ ticks
 30.0
 
 BUTTON
-7
-46
-96
-79
+35
+40
+98
+73
 NIL
-setup\n
+setup
 NIL
 1
 T
@@ -74,10 +74,10 @@ NIL
 1
 
 BUTTON
-112
-46
-197
-79
+110
+40
+173
+73
 NIL
 go
 T
@@ -90,126 +90,154 @@ NIL
 NIL
 0
 
-PLOT
-229
-143
-744
-300
-wealth distribution
-NIL
-NIL
-0.0
-500.0
-0.0
-40.0
-false
-false
-"" ""
-PENS
-"current" 5.0 1 -10899396 true "" "histogram [wealth] of turtles"
+SLIDER
+5
+90
+194
+123
+wiggle-angle
+wiggle-angle
+0
+100
+60
+1.0
+1
+degrees
+HORIZONTAL
 
-MONITOR
-599
-425
-744
-470
-wealth of bottom 50%
-sum [wealth] of min-n-of 250 turtles [wealth]
+SLIDER
+5
+130
+194
+163
+num-particles
+num-particles
+0
+5000
+2500
 1
 1
-11
-
-MONITOR
-608
-365
-728
-410
-wealth of top 10%
-sum [wealth] of max-n-of 50 turtles [wealth]
-1
-1
-11
-
-TEXTBOX
-563
-176
-679
-206
-Total wealth = $50,000
-11
-0.0
-1
-
-PLOT
-229
-332
-563
-482
-wealth by percent
 NIL
+HORIZONTAL
+
+SLIDER
+5
+170
+195
+203
+probability-of-sticking
+probability-of-sticking
+0
+1
+1
+.01
+1
 NIL
-0.0
-10.0
-0.0
-10000.0
-true
-true
-"" ""
-PENS
-"top-10%" 1.0 0 -2674135 true "" "plot sum [wealth] of max-n-of 50 turtles [wealth]"
-"bottom-50%" 1.0 0 -13345367 true "" "plot sum [wealth] of min-n-of 250 turtles [wealth]"
+HORIZONTAL
+
+SWITCH
+5
+215
+187
+248
+neighbor-influence?
+neighbor-influence?
+1
+1
+-1000
+
+SLIDER
+5
+260
+177
+293
+num-seeds
+num-seeds
+1
+10
+10
+1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## ACKNOWLEDGEMENT
 
-This model is from Chapter Two of the book "Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo", by Uri Wilensky & William Rand.
+This model is from Chapter Three of the book "Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo", by Uri Wilensky & William Rand.
 
-Wilensky, U & Rand, W. (2015). Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo. Cambridge, Ma. MIT Press.
+Wilensky, U. & Rand, W. (2015). Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo. Cambridge, Ma. MIT Press.
 
 This model is in the IABM Textbook folder of the NetLogo models library. The model, as well as any updates to the model, can also be found on the textbook website: http://intro-to-abm.com.
 
 ## WHAT IS IT?
 
-This model is a very simple model of economic exchange.  It is a thought experiment of  a world where, in every time step, each person gives one dollar to one other person (at random) if they have any money to give.  If they have no money then they do not give out any money.
+Like the main DLA model, this model demonstrates diffusion-limited aggregation, in which particles moving (diffusing) in random trajectories stick together (aggregate) to form beautiful treelike branching fractal structures. There are many patterns found in nature that resemble the patterns produced by this model: crystals, coral, fungi, lightning, and so on.
 
-## HOW IT WORKS
+This model is called DLA Simple because it is it is a simplified version of the main DLA model in the Chemistry and Physics section of the NetLogo models library. In the main model, new particles are created as existing particles aggregate. In this model, particles are only created at the beginning. The main model is more computationally efficient, but the rules that drive the phenomenon are more digestible in this model.
 
-The SETUP for the model creates 500 agents, and then gives them each 100 dollars.  At each tick, they give one dollar to another agent if they can.  If they have no money then they do nothing. Each agent also moves to an x-coordinate equal to its wealth.
+This model extends the DLA Simple Extension 2 model because it allows for multiple seeds rather than the original model which only had one seed.
 
 ## HOW TO USE IT
 
-Press SETUP to setup the model, then press GO to watch the model develop.
+Press SETUP to make the initial NUM-SEEDS seeds, and NUM-PARTICLES particles, then press GO to run the model.
+The WIGGLE-ANGLE slider controls how wiggly the paths the particles follow are. If WIGGLE-ANGLE is 0, they move in straight lines. If WIGGLE-ANGLE is 360, they move in a totally random direction at each time step.
+The PROB-OF-STICKING slider controls the probability that a particle colliding with the aggregate will die there and add to the aggregate (by turning its patch green).
 
 ## THINGS TO NOTICE
 
-Examine the various graphs and see how the model unfolds. Let it run for many ticks. The WEALTH DISTRIBUTION graph will change shape dramatically as time goes on. What happens to the WEALTH BY PERCENT graph over time?
+Note that the resulting structure has a branching structure, like a tree.  Why does this happen?
+
+What other phenomena in the world do the shapes remind you of?  Is this aggregation process a plausible model of how those phenomena occur?
 
 ## THINGS TO TRY
-Try running the model for many thousands of ticks. Does the distribution stabilize? How can you measure stabilization? Keep track of some individual agents. How do they move?
 
+Try different settings for how much the turtles turn as they do their random walk (the WIGGLE-ANGLE slider).  What is the effect on the appearance of the resulting aggregate?  Why?
+
+Does it make any difference whether there are more or fewer particles?  Why or why not?
+
+How does the PROBABILITY-OF-STICKING affect the model results?
+
+How does NEIGHBOR-INFLUENCE? affect the model results?
+
+Explore how the pattern changes when different numbers of seeds are used.
+
+How do PROBABILITY-OF-STICKING, NEIGHBOR-INFLUENCE?, and the number of seeds interact to create different structures?
 
 ## EXTENDING THE MODEL
-Change the number of turtles.  Does this affect the results?
-Change the rules so agents can go into debt. Does this affect the results?
-Change the basic transaction rule of the model.  What happens if the turtles exchange more than one dollar? How about if they give a random amount to another agent at each tick? Change the rules so that the richer agents have a better chance of being given money? Or a smaller chance? How does this change the results?
+
+What happens if you start with more than one "seed" patch?  What happens if the seed is a line instead of a point?
+
+Can you find a way to modify the code so the resulting pattern spirals out instead of radiating straight out?
+
+The rule used in this model is that a particle "sticks" if any of the eight patches surrounding it are green.  What do the resulting structures look like if you use a different rule (for example, only testing the single patch ahead, or using NEIGHBORS4 instead of NEIGHBORS)?
+
+Can you compute the fractal dimension of the aggregate?
+
+If instead of using green, you gradually vary the color of deposited particles over time, you can see more vividly the accretion of "layers" over time.  (The effect is also visually pleasing.)
+
+The model will run faster if the turtles are invisible, so you may want to add a switch that hides them (using the HT command).
 
 ## NETLOGO FEATURES
 
-This model makes extensive use of the "widget" based graph methods.
+Note the use of the NEIGHBORS primitive.
 
 ## RELATED MODELS
 
-This model is related to the WEALTH DISTRIBUTION model.
+The various models in the "Fractals" subsection of the "Mathematics" section of the Models Library demonstrate some other ways of "growing" fractal structures.
+
+The "Percolation" model in the "Earth Science" section produces patterns resembling the patterns in this model.
 
 ## HOW TO CITE
 
-This model is part of the textbook, “Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo.”
-
-If you mention this model or the NetLogo software in a publication, we ask that you include the citations below.
+This model is part of the textbook, "Introduction to Agent-Based Modeling: Modeling 
+ Natural, Social and Engineered Complex Systems with NetLogo."
+ 
+If you mention this model or the NetLogo software in a publication, we ask that you include the cites.
 
 For the model itself:
 
-* Wilensky, U. (2011).  NetLogo Simple Economy model.  http://ccl.northwestern.edu/netlogo/models/IABMTextbook/SimpleEconomy.  Center for Connected Learning and Computer-Based Modeling, Northwestern University, Evanston, IL
+* Wilensky, U. & Rand, W. (2006).  NetLogo DLA Simple Extension 3 model.  http://ccl.northwestern.edu/netlogo/models/IABMTextbook/DLASimpleExtension3.  Center for Connected Learning and Computer-Based Modeling, Northwestern University, Evanston, IL.
 
 Please cite the NetLogo software as:
 
@@ -217,12 +245,18 @@ Please cite the NetLogo software as:
 
 Please cite the textbook as:
 
-* Wilensky, U. & Rand, W. (2015). Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo. Cambridge, Ma. MIT Press.
+* Wilensky, U  & Rand, W. (2015). Introduction to Agent-Based Modeling: Modeling 
+ Natural, Social and Engineered Complex Systems with NetLogo. Cambridge, Ma. MIT Press.
 
 ## CREDITS AND REFERENCES
 
-Models of this kind are described in: 
-Dragulescu, A. & V.M. Yakovenko, V.M. (2000).  Statistical Mechanics of Money. European Physics Journal B.
+This model is a simplified version of:
+
+Wilensky, U. (1997). NetLogo DLA model. http://ccl.northwestern.edu/netlogo/models/DLA. Center for Connected Learning and Computer-Based Modeling, Northwestern University, Evanston, IL.
+
+The concept of diffusion limited aggregation was invented by T.A. Witten and L.M. Sander in 1981.  Witten, T. & Sanders, L. (1981).  Diffusion-limited aggregation, a kinetic critical phenomena. Phys. Rev. Lett. 47(19), 1400–1403 (1981).
+
+Tamas Viczek's book "Fractal Growth Phenomena" contains a discussion, as do many other books about fractals.
 @#$#@#$#@
 default
 true
@@ -297,16 +331,6 @@ false
 Polygon -7500403 true true 200 193 197 249 179 249 177 196 166 187 140 189 93 191 78 179 72 211 49 209 48 181 37 149 25 120 25 89 45 72 103 84 179 75 198 76 252 64 272 81 293 103 285 121 255 121 242 118 224 167
 Polygon -7500403 true true 73 210 86 251 62 249 48 208
 Polygon -7500403 true true 25 114 16 195 9 204 23 213 25 200 39 123
-
-cylinder
-false
-0
-Circle -7500403 true true 0 0 300
-
-dot
-false
-0
-Circle -7500403 true true 90 90 120
 
 face happy
 false
@@ -384,11 +408,6 @@ line
 true
 0
 Line -7500403 true 150 0 150 300
-
-line half
-true
-0
-Line -7500403 true 150 0 150 150
 
 pentagon
 false
@@ -509,6 +528,8 @@ Polygon -7500403 true true 30 75 75 30 270 225 225 270
 @#$#@#$#@
 NetLogo 5.2.0-RC4
 @#$#@#$#@
+setup
+repeat 450 [ go ]
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
@@ -525,5 +546,5 @@ Line -7500403 true 150 150 90 180
 Line -7500403 true 150 150 210 180
 
 @#$#@#$#@
-0
+1
 @#$#@#$#@

@@ -1,68 +1,144 @@
-turtles-own [wealth]
+extensions [nw]
+
+turtles-own [
+  adopted?    ;; whether or not the agent has adopted the product
+]
 
 to setup
   clear-all
-  create-turtles 500 [
-    set wealth 100
-    set shape "circle"
-    set color green
-    set size 2 
-
-  ;;  visualize the turtles from left to right in ascending order of wealth 
-    setxy wealth random-ycor 
-  ]
   reset-ticks
+  create-network
+  seed
 end
 
+;; seed the population with users who have already been given the product
+;;  you can either seed randomly or use betweenness centrality
+to seed
+  if centrality-measure = "random" [
+    ask n-of budget turtles [
+      set adopted? true
+      update-color
+    ]
+  ]
+  if centrality-measure = "betweenness" [
+    ask max-n-of budget turtles [ nw:betweenness-centrality ] [
+      set adopted? true
+      update-color
+    ]
+  ]
+end
 
+;; create the social network
+to create-network
+  if network-type = "random" [ create-random-network ]
+  if network-type = "preferential-attachment" [ create-preferential-attachment ]
+end
+
+;; the Barabasi-Albert method of creating a PA graph
+to create-preferential-attachment
+  nw:generate-preferential-attachment turtles links 500 [
+    set size 2
+    set shape "circle"
+    set color blue
+    set adopted? false
+  ]
+end
+
+;; generate an Erdos-Renyi random graph
+to create-random-network
+  nw:generate-random turtles links 500 0.004 [
+    set shape "circle"
+    set color blue
+    set size 2
+    set adopted? false
+  ]
+end
+
+;; simple loop just check to see if a turtle hasn't adopted then decide if they should adopt
 to go
-  ;; transact and then update your location
-  ask turtles with [wealth > 0] [transact]
-  ;; prevent wealthy turtles from moving too far to the right
-  ask turtles [if wealth <= max-pxcor [set xcor wealth] ]
   tick
+  ask turtles with [ not adopted? ] [ decide-to-adopt ]
+  ask turtles [ update-color ]
+  if all? turtles [ adopted? ] [ stop ]
 end
 
-to transact
-  ;; give a dollar to another turtle
-  set wealth wealth - 1
-  ask one-of other turtles [set wealth wealth + 1]
+;; the decision rule to adopt which is based on the Bass model of diffusion
+to decide-to-adopt
+  ifelse random-float 1.0 < .01 [
+    set adopted? true
+  ]
+  [
+    if any? link-neighbors [
+      let neighbors-adoption count link-neighbors with [ adopted? ] / count link-neighbors
+      if random-float 1.0 < 0.5 * neighbors-adoption [
+        set adopted? true
+      ]
+    ]
+  ]
+end
+
+;;
+;; utility procedures
+;;
+to update-color
+  if adopted? [ set color red ]
+end
+
+to layout
+  layout-spring turtles links 1 14 1.5
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-233
-16
-744
-128
--1
--1
-1.0
+174
+13
+689
+549
+50
+50
+5.0
 1
 10
 1
 1
 1
 0
-0
-0
-1
-0
-500
-0
-80
 1
 1
+1
+-50
+50
+-50
+50
+0
+0
 1
 ticks
 30.0
 
 BUTTON
-7
-46
-96
-79
+76
+140
+146
+173
+layout
+layout
+T
+1
+T
+OBSERVER
 NIL
-setup\n
+NIL
+NIL
+NIL
+0
+
+BUTTON
+11
+140
+74
+173
+setup
+setup
 NIL
 1
 T
@@ -74,11 +150,11 @@ NIL
 1
 
 BUTTON
-112
-46
-197
-79
-NIL
+11
+174
+146
+207
+go
 go
 T
 1
@@ -90,74 +166,40 @@ NIL
 NIL
 0
 
-PLOT
-229
-143
-744
-300
-wealth distribution
-NIL
-NIL
-0.0
-500.0
-0.0
-40.0
-false
-false
-"" ""
-PENS
-"current" 5.0 1 -10899396 true "" "histogram [wealth] of turtles"
-
-MONITOR
-599
-425
-744
-470
-wealth of bottom 50%
-sum [wealth] of min-n-of 250 turtles [wealth]
-1
-1
+CHOOSER
 11
+93
+146
+138
+centrality-measure
+centrality-measure
+"betweenness" "random"
+0
 
-MONITOR
-608
-365
-728
-410
-wealth of top 10%
-sum [wealth] of max-n-of 50 turtles [wealth]
-1
-1
+CHOOSER
 11
+14
+145
+59
+network-type
+network-type
+"random" "preferential-attachment"
+0
 
-TEXTBOX
-563
-176
-679
-206
-Total wealth = $50,000
+SLIDER
 11
-0.0
+58
+145
+91
+budget
+budget
 1
-
-PLOT
-229
-332
-563
-482
-wealth by percent
+10
+1
+1
+1
 NIL
-NIL
-0.0
-10.0
-0.0
-10000.0
-true
-true
-"" ""
-PENS
-"top-10%" 1.0 0 -2674135 true "" "plot sum [wealth] of max-n-of 50 turtles [wealth]"
-"bottom-50%" 1.0 0 -13345367 true "" "plot sum [wealth] of min-n-of 250 turtles [wealth]"
+HORIZONTAL
 
 @#$#@#$#@
 ## ACKNOWLEDGEMENT
@@ -170,59 +212,41 @@ This model is in the IABM Textbook folder of the NetLogo models library. The mod
 
 ## WHAT IS IT?
 
-This model is a very simple model of economic exchange.  It is a thought experiment of  a world where, in every time step, each person gives one dollar to one other person (at random) if they have any money to give.  If they have no money then they do not give out any money.
+This model is a simple experiment that allows researchers to examine how to best seed a network to maximize the adoption rate of a product by using viral marketing.
+
+Its purpose is to allow you to explore the relationship between different centrality measures, and different network types, and see if the interactions between them make for faster or slower spread of the product.
 
 ## HOW IT WORKS
 
-The SETUP for the model creates 500 agents, and then gives them each 100 dollars.  At each tick, they give one dollar to another agent if they can.  If they have no money then they do nothing. Each agent also moves to an x-coordinate equal to its wealth.
+When the model is set up, 500 turtles are created and connected in a network of the type selected (preferential attachment or a random network). A number of turtles are seeded with the product at time 0. At each tick, each turtle has a small chance of adopting the product on their own (1%), and a larger chance of adopting the product if any of their friends have adopted the product (0.5 * the ratio of neighbors who have adopted to the number of all neighbors).
+
+The model stops when the whole market is saturated.
 
 ## HOW TO USE IT
 
-Press SETUP to setup the model, then press GO to watch the model develop.
+Start by selecting a type of network. Then choose how many turtles are initially seeded and by what centrality measure these turtles are selected.
 
-## THINGS TO NOTICE
-
-Examine the various graphs and see how the model unfolds. Let it run for many ticks. The WEALTH DISTRIBUTION graph will change shape dramatically as time goes on. What happens to the WEALTH BY PERCENT graph over time?
+When you click SETUP, the network will be generated, and when you click GO, nodes will start infecting their neighbors.
 
 ## THINGS TO TRY
-Try running the model for many thousands of ticks. Does the distribution stabilize? How can you measure stabilization? Keep track of some individual agents. How do they move?
 
+Try to set up different kinds of networks, and select the initially seeded turtles by different centrality measures. Are there particular measures that might result in a faster spread in particular types of networks, but not in others? Why do you think that is?
 
 ## EXTENDING THE MODEL
-Change the number of turtles.  Does this affect the results?
-Change the rules so agents can go into debt. Does this affect the results?
-Change the basic transaction rule of the model.  What happens if the turtles exchange more than one dollar? How about if they give a random amount to another agent at each tick? Change the rules so that the richer agents have a better chance of being given money? Or a smaller chance? How does this change the results?
 
-## NETLOGO FEATURES
+The model was inspired by the Local Viral Marketing Problem (Stonedahl, Rand & Wilensky 2010) of an adoption network. Currently the model simply measures how fast a virus spreads on a network, but does not take into account how fast it is spread to each individual node which is one way to calculate the net present value (NPV) of a strategy. If the model were to fully implement the NPV of a model, the value of each infected node would depend on at what time it was infected.
 
-This model makes extensive use of the "widget" based graph methods.
+Further, the model currently allows for only two different network types and four centrality measures. These could be extended as well.
 
-## RELATED MODELS
-
-This model is related to the WEALTH DISTRIBUTION model.
-
-## HOW TO CITE
-
-This model is part of the textbook, “Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo.”
-
-If you mention this model or the NetLogo software in a publication, we ask that you include the citations below.
-
-For the model itself:
-
-* Wilensky, U. (2011).  NetLogo Simple Economy model.  http://ccl.northwestern.edu/netlogo/models/IABMTextbook/SimpleEconomy.  Center for Connected Learning and Computer-Based Modeling, Northwestern University, Evanston, IL
-
-Please cite the NetLogo software as:
-
-* Wilensky, U. (1999). NetLogo. http://ccl.northwestern.edu/netlogo/. Center for Connected Learning and Computer-Based Modeling, Northwestern University, Evanston, IL.
-
-Please cite the textbook as:
-
-* Wilensky, U. & Rand, W. (2015). Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo. Cambridge, Ma. MIT Press.
+Finally, the model only allows users to choose one centrality measure by which to initially infect turtles. Ideally it would be possible to set a number of infected turtles, and choose proportions of centrality measures to infect these turtles.
 
 ## CREDITS AND REFERENCES
 
-Models of this kind are described in: 
-Dragulescu, A. & V.M. Yakovenko, V.M. (2000).  Statistical Mechanics of Money. European Physics Journal B.
+Stonedahl, Forrest, William Rand, and Uri Wilensky (2010), "Evolving Viral Marketing Strategies," Genetic and Evolutionary Computation Conference (GECCO), July 7-11, Portland, OR, USA
+
+Rand, William M. and Rust, Roland T., Agent-Based Modeling in Marketing: Guidelines for Rigor (June 10, 2011). International Journal of Research in Marketing, 2011; Robert H. Smith School Research Paper No. RHS 06-132. Available at SSRN: http://ssrn.com/abstract=1818543
+
+This model is a simplified model based on another model by Arthur Hjorth (arthur.hjorth@u.northwestern.edu).
 @#$#@#$#@
 default
 true
@@ -416,6 +440,22 @@ Polygon -7500403 true true 135 105 90 60 45 45 75 105 135 135
 Polygon -7500403 true true 165 105 165 135 225 105 255 45 210 60
 Polygon -7500403 true true 135 90 120 45 150 15 180 45 165 90
 
+sheep
+false
+15
+Circle -1 true true 203 65 88
+Circle -1 true true 70 65 162
+Circle -1 true true 150 105 120
+Polygon -7500403 true false 218 120 240 165 255 165 278 120
+Circle -7500403 true false 214 72 67
+Rectangle -1 true true 164 223 179 298
+Polygon -1 true true 45 285 30 285 30 240 15 195 45 210
+Circle -1 true true 3 83 150
+Rectangle -1 true true 65 221 80 296
+Polygon -1 true true 195 285 210 285 210 240 240 210 195 210
+Polygon -7500403 true false 276 85 285 105 302 99 294 83
+Polygon -7500403 true false 219 85 210 105 193 99 201 83
+
 square
 false
 0
@@ -500,6 +540,13 @@ Line -7500403 true 40 84 269 221
 Line -7500403 true 40 216 269 79
 Line -7500403 true 84 40 221 269
 
+wolf
+false
+0
+Polygon -16777216 true false 253 133 245 131 245 133
+Polygon -7500403 true true 2 194 13 197 30 191 38 193 38 205 20 226 20 257 27 265 38 266 40 260 31 253 31 230 60 206 68 198 75 209 66 228 65 243 82 261 84 268 100 267 103 261 77 239 79 231 100 207 98 196 119 201 143 202 160 195 166 210 172 213 173 238 167 251 160 248 154 265 169 264 178 247 186 240 198 260 200 271 217 271 219 262 207 258 195 230 192 198 210 184 227 164 242 144 259 145 284 151 277 141 293 140 299 134 297 127 273 119 270 105
+Polygon -7500403 true true -1 195 14 180 36 166 40 153 53 140 82 131 134 133 159 126 188 115 227 108 236 102 238 98 268 86 269 92 281 87 269 103 269 113
+
 x
 false
 0
@@ -511,6 +558,24 @@ NetLogo 5.2.0-RC4
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
+<experiments>
+  <experiment name="SNA Experiment" repetitions="1000" runMetricsEveryStep="false">
+    <setup>setup</setup>
+    <go>go</go>
+    <timeLimit steps="1000"/>
+    <exitCondition>all? turtles [ adopted? ]</exitCondition>
+    <metric>count turtles with [ adopted? ]</metric>
+    <enumeratedValueSet variable="centrality-measure">
+      <value value="&quot;betweenness&quot;"/>
+      <value value="&quot;random&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="network-type">
+      <value value="&quot;random&quot;"/>
+      <value value="&quot;preferential-attachment&quot;"/>
+    </enumeratedValueSet>
+    <steppedValueSet variable="budget" first="1" step="1" last="10"/>
+  </experiment>
+</experiments>
 @#$#@#$#@
 @#$#@#$#@
 default

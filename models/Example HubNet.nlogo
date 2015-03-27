@@ -1,68 +1,88 @@
-turtles-own [wealth]
+turtles-own [ user-id ]
 
 to setup
   clear-all
-  create-turtles 500 [
-    set wealth 100
-    set shape "circle"
-    set color green
-    set size 2 
+  hubnet-reset
+end
 
-  ;;  visualize the turtles from left to right in ascending order of wealth 
-    setxy wealth random-ycor 
+to listen-clients
+  ;; This is the core logic of our message handling code:
+  while [ hubnet-message-waiting? ] [
+    hubnet-fetch-message ;; make the next message the current message.
+    ifelse hubnet-enter-message? [
+      ;; A new client has entered! We need to create a turtle for it.
+      print (word "Client with id: " hubnet-message-source " entered")
+      create-turtles 1 [
+        set user-id hubnet-message-source ;; associate the turtle with its client
+        hubnet-send-follow user-id self 4 ;; set the client perspective to follow the turtle
+      ]
+    ]
+    [
+      ifelse hubnet-exit-message? [
+        ;; A client has dropped out! We need to get rid of its turtle.
+        print (word "Client with id: " hubnet-message-source " exited")
+        ask turtles with [ user-id = hubnet-message-source ] [ die ]
+      ]
+      [
+        ;; A client has done something! We need to handle
+        ;; the message we received from it.
+        ask turtles with [ user-id = hubnet-message-source ] [
+          if hubnet-message-tag = "forward" [
+            ;; The forward button has been clicked.
+            ;; We need to move the turtle:
+            forward 1
+            ;; and show its new coordinates on the client monitor
+            let coords (word "(" pxcor ", " pycor ")")
+            hubnet-send user-id "location" coords
+          ]
+          if hubnet-message-tag = "View" [
+            ;; The client has clicked somewhere on the view.
+            ;; The turtle needs to face the click location:
+            facexy (item 0 hubnet-message) (item 1 hubnet-message)
+          ]
+        ]
+        print (word "Message from: " hubnet-message-source)
+        print (word "  message tag: " hubnet-message-tag)
+        print (word "  message body: " hubnet-message)
+      ]
+    ]
   ]
-  reset-ticks
-end
-
-
-to go
-  ;; transact and then update your location
-  ask turtles with [wealth > 0] [transact]
-  ;; prevent wealthy turtles from moving too far to the right
-  ask turtles [if wealth <= max-pxcor [set xcor wealth] ]
-  tick
-end
-
-to transact
-  ;; give a dollar to another turtle
-  set wealth wealth - 1
-  ask one-of other turtles [set wealth wealth + 1]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-233
+159
+10
+598
+470
 16
-744
-128
--1
--1
-1.0
+16
+13.0
 1
 10
 1
 1
 1
 0
-0
-0
-1
-0
-500
-0
-80
 1
 1
+1
+-16
+16
+-16
+16
+0
+0
 1
 ticks
 30.0
 
 BUTTON
-7
-46
-96
-79
+45
+40
+115
+73
 NIL
-setup\n
+setup
 NIL
 1
 T
@@ -74,12 +94,12 @@ NIL
 1
 
 BUTTON
-112
-46
-197
-79
+20
+100
+140
+133
 NIL
-go
+listen-clients
 T
 1
 T
@@ -88,141 +108,108 @@ NIL
 NIL
 NIL
 NIL
-0
+1
 
-PLOT
-229
-143
-744
-300
-wealth distribution
+BUTTON
+20
+185
+140
+218
+color patches
+set pcolor one-of base-colors
+NIL
+1
+T
+PATCH
 NIL
 NIL
-0.0
-500.0
-0.0
-40.0
-false
-false
-"" ""
-PENS
-"current" 5.0 1 -10899396 true "" "histogram [wealth] of turtles"
-
-MONITOR
-599
-425
-744
-470
-wealth of bottom 50%
-sum [wealth] of min-n-of 250 turtles [wealth]
-1
-1
-11
-
-MONITOR
-608
-365
-728
-410
-wealth of top 10%
-sum [wealth] of max-n-of 50 turtles [wealth]
-1
-1
-11
-
-TEXTBOX
-563
-176
-679
-206
-Total wealth = $50,000
-11
-0.0
-1
-
-PLOT
-229
-332
-563
-482
-wealth by percent
 NIL
 NIL
-0.0
-10.0
-0.0
-10000.0
-true
-true
-"" ""
-PENS
-"top-10%" 1.0 0 -2674135 true "" "plot sum [wealth] of max-n-of 50 turtles [wealth]"
-"bottom-50%" 1.0 0 -13345367 true "" "plot sum [wealth] of min-n-of 250 turtles [wealth]"
+1
 
 @#$#@#$#@
 ## ACKNOWLEDGEMENT
 
-This model is from Chapter Two of the book "Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo", by Uri Wilensky & William Rand.
+This model is from Chapter Eight of the book "Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo", by Uri Wilensky & William Rand.
 
-Wilensky, U & Rand, W. (2015). Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo. Cambridge, Ma. MIT Press.
+Wilensky, U. & Rand, W. (2015). Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo. Cambridge, Ma. MIT Press.
 
 This model is in the IABM Textbook folder of the NetLogo models library. The model, as well as any updates to the model, can also be found on the textbook website: http://intro-to-abm.com.
 
 ## WHAT IS IT?
 
-This model is a very simple model of economic exchange.  It is a thought experiment of  a world where, in every time step, each person gives one dollar to one other person (at random) if they have any money to give.  If they have no money then they do not give out any money.
+This model provides the basic structure of the code for a HubNet model. For this reason, the model is very simple: all that each participant can do is move their turtle around the world. 
+
+This model can be used as a template to build more complex participatory simulations. 
 
 ## HOW IT WORKS
-
-The SETUP for the model creates 500 agents, and then gives them each 100 dollars.  At each tick, they give one dollar to another agent if they can.  If they have no money then they do nothing. Each agent also moves to an x-coordinate equal to its wealth.
+The model first loads HubNet. It then listens to HubNet's messages, and does one of four things: If a new users has entered, it creates a turtle for that user. If a user presses the 'forward' button, it asks the user's turtle to move forward. If a user clicks somewhere in their turtle's view of the model, it makes their turtle face that direction. And if a user leaves HubNet, it removes that turtle from the world.
 
 ## HOW TO USE IT
 
-Press SETUP to setup the model, then press GO to watch the model develop.
+HubNet activities are used from two different interfaces. First, there is the server interface, from where you manage the simulation for all participants involved. Second, there is the client interface, that each participant uses to control their own little part of the simulation.
+
+### Server Interface
+
+SETUP -- This button resets the simulation and opens the HubNet Control Center, from which you can see all the connected clients. Clicking LOCAL in the Control Center will allow you to create a client on your own computer so you can test the activity from a user's point of view.
+
+LISTEN-CLIENTS -- This button runs the activity: as long as LISTEN-CLIENTS is pressed, client messages are processed and the model is updated accordingly.
+
+COLOR PATCHES -- This button gives a new random color to each patch.
+
+### Client Interface
+
+When using the model as a client, the view follows the turtle that you are controlling, showing only the part of the world immediately surrounding it.
+
+The client interface is just as simple as the server interface:
+
+FORWARD -- This button causes your turtle to move forward by one unit.
+
+LOCATION -- This monitor shows you the (x, y) coordinates of your turtle in the world.
+
+You can also click directly on the view: this will cause your turtle to face the location that was clicked, thereby allowing you to control the direction in which the turtle is going.
 
 ## THINGS TO NOTICE
 
-Examine the various graphs and see how the model unfolds. Let it run for many ticks. The WEALTH DISTRIBUTION graph will change shape dramatically as time goes on. What happens to the WEALTH BY PERCENT graph over time?
+When the turtles move over a black background, it is hard for a participant to tell that their turtle _is_ indeed moving, unless there is another turtle in its immediate neighborhood. This is what the COLOR PATCHES button is for: the colorful background makes the movement of the turtle apparent.
 
-## THINGS TO TRY
-Try running the model for many thousands of ticks. Does the distribution stabilize? How can you measure stabilization? Keep track of some individual agents. How do they move?
+The lesson here is that designing an HubNet activity requires you to take the individual agent's point of view into account in addition to the "outside observer" point of view that is commonly used in NetLogo models. In this sense, HubNet activities are very much in the spirit of _agent-based_ modeling.
 
+Note that HubNet messages are always sent between clients and the HubNet server, even if the model doesn't do anything with the messages. If HubNet messages are not fetched, they will queue up for the user to deal with later, using `hubnet-fetch-message`.
 
 ## EXTENDING THE MODEL
-Change the number of turtles.  Does this affect the results?
-Change the rules so agents can go into debt. Does this affect the results?
-Change the basic transaction rule of the model.  What happens if the turtles exchange more than one dollar? How about if they give a random amount to another agent at each tick? Change the rules so that the richer agents have a better chance of being given money? Or a smaller chance? How does this change the results?
+
+Our HubNet model is very simple, but our `listen-clients` procedure is already fairly long. For a more complex model, it could be worth spending a bit of time to separate the message handling logic from the actions that actually take place when different kinds of messages are received. Stripped to its core, `listen-clients` could be something like this:
+
+```
+to listen-clients
+  while [ hubnet-message-waiting? ] [
+    hubnet-fetch-message
+    ifelse hubnet-enter-message?
+      [ add-client-turtle ]
+      [ ifelse hubnet-exit-message?
+          [ remove-client-turtle ]
+          [ handle-client-action ]
+      ]
+  ]
+end
+```
+
+You would then need to fill out `add-client-turtle`, `remove-client-turtle` and `handle-client-action` with the code that we moved out of the procedure. If you wanted to push the modularization even further, you could have a different procedure for each possible client actions instead of handling them all in the `handle-client-action` procedure.
+
+This kind of modularization allow you to build complex models without loosing track of the high-level logic of your code.
 
 ## NETLOGO FEATURES
 
-This model makes extensive use of the "widget" based graph methods.
+The main NetLogo features used here are, unsurprisingly, the HubNet related primitives that allow you to build a collaborative simulation.
+
+Notice, also, that the COLOR PATCHES button is a bit different from the others: it has a little patch icon in its upper left corner, indicating that the code associated with it (`set pcolor one-of base-colors`) applies to all patches, just like if it had been enclosed inside an "`ask patches`" block.
 
 ## RELATED MODELS
 
-This model is related to the WEALTH DISTRIBUTION model.
-
-## HOW TO CITE
-
-This model is part of the textbook, “Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo.”
-
-If you mention this model or the NetLogo software in a publication, we ask that you include the citations below.
-
-For the model itself:
-
-* Wilensky, U. (2011).  NetLogo Simple Economy model.  http://ccl.northwestern.edu/netlogo/models/IABMTextbook/SimpleEconomy.  Center for Connected Learning and Computer-Based Modeling, Northwestern University, Evanston, IL
-
-Please cite the NetLogo software as:
-
-* Wilensky, U. (1999). NetLogo. http://ccl.northwestern.edu/netlogo/. Center for Connected Learning and Computer-Based Modeling, Northwestern University, Evanston, IL.
-
-Please cite the textbook as:
-
-* Wilensky, U. & Rand, W. (2015). Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo. Cambridge, Ma. MIT Press.
+This model originaly based upon the Template HubNet model from the library. All the models in the HubNet Activities folder of the library more or less share the same basic structure.
 
 ## CREDITS AND REFERENCES
-
-Models of this kind are described in: 
-Dragulescu, A. & V.M. Yakovenko, V.M. (2000).  Statistical Mechanics of Money. European Physics Journal B.
 @#$#@#$#@
 default
 true
@@ -416,6 +403,22 @@ Polygon -7500403 true true 135 105 90 60 45 45 75 105 135 135
 Polygon -7500403 true true 165 105 165 135 225 105 255 45 210 60
 Polygon -7500403 true true 135 90 120 45 150 15 180 45 165 90
 
+sheep
+false
+15
+Circle -1 true true 203 65 88
+Circle -1 true true 70 65 162
+Circle -1 true true 150 105 120
+Polygon -7500403 true false 218 120 240 165 255 165 278 120
+Circle -7500403 true false 214 72 67
+Rectangle -1 true true 164 223 179 298
+Polygon -1 true true 45 285 30 285 30 240 15 195 45 210
+Circle -1 true true 3 83 150
+Rectangle -1 true true 65 221 80 296
+Polygon -1 true true 195 285 210 285 210 240 240 210 195 210
+Polygon -7500403 true false 276 85 285 105 302 99 294 83
+Polygon -7500403 true false 219 85 210 105 193 99 201 83
+
 square
 false
 0
@@ -500,6 +503,13 @@ Line -7500403 true 40 84 269 221
 Line -7500403 true 40 216 269 79
 Line -7500403 true 84 40 221 269
 
+wolf
+false
+0
+Polygon -16777216 true false 253 133 245 131 245 133
+Polygon -7500403 true true 2 194 13 197 30 191 38 193 38 205 20 226 20 257 27 265 38 266 40 260 31 253 31 230 60 206 68 198 75 209 66 228 65 243 82 261 84 268 100 267 103 261 77 239 79 231 100 207 98 196 119 201 143 202 160 195 166 210 172 213 173 238 167 251 160 248 154 265 169 264 178 247 186 240 198 260 200 271 217 271 219 262 207 258 195 230 192 198 210 184 227 164 242 144 259 145 284 151 277 141 293 140 299 134 297 127 273 119 270 105
+Polygon -7500403 true true -1 195 14 180 36 166 40 153 53 140 82 131 134 133 159 126 188 115 227 108 236 102 238 98 268 86 269 92 281 87 269 103 269 113
+
 x
 false
 0
@@ -512,6 +522,52 @@ NetLogo 5.2.0-RC4
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
+VIEW
+162
+43
+591
+472
+0
+0
+0
+1
+1
+1
+1
+1
+0
+1
+1
+1
+-16
+16
+-16
+16
+
+BUTTON
+70
+112
+150
+145
+forward
+NIL
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+
+MONITOR
+76
+199
+139
+248
+location
+NIL
+3
+1
+
 @#$#@#$#@
 default
 0.0
@@ -525,5 +581,5 @@ Line -7500403 true 150 150 90 180
 Line -7500403 true 150 150 210 180
 
 @#$#@#$#@
-0
+1
 @#$#@#$#@

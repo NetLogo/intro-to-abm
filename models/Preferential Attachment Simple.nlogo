@@ -1,55 +1,44 @@
-turtles-own [wealth]
-
 to setup
-  clear-all
-  create-turtles 500 [
-    set wealth 100
-    set shape "circle"
-    set color green
-    set size 2 
-
-  ;;  visualize the turtles from left to right in ascending order of wealth 
-    setxy wealth random-ycor 
-  ]
+  ca
+  set-default-shape turtles "circle"
+  create-turtles 2 [ fd 5 ]                              ;; create two turtles (nodes) and space them out
+  ask turtle 0 [ create-link-with turtle 1 ]  ;; create a link between them
   reset-ticks
 end
 
-
 to go
-  ;; transact and then update your location
-  ask turtles with [wealth > 0] [transact]
-  ;; prevent wealthy turtles from moving too far to the right
-  ask turtles [if wealth <= max-pxcor [set xcor wealth] ]
+  if count turtles > num-nodes [stop]
+  ;; choose a partner attached to a random link
+  ;; this gives a node a chance to be a partner based on how many links it has
+  let partner one-of [both-ends] of one-of links ;; this is the heart of the preferential attachment mechanism
+  ;; create new node, link to partner
+  create-turtles 1 [ fd 5 create-link-with partner ]
+  ;; lay out the nodes with a spring layout
+  layout-spring turtles links 0.2 5 1
   tick
-end
-
-to transact
-  ;; give a dollar to another turtle
-  set wealth wealth - 1
-  ask one-of other turtles [set wealth wealth + 1]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-233
+210
+10
+649
+470
 16
-744
-128
--1
--1
-1.0
+16
+13.0
 1
 10
 1
 1
 1
 0
-0
-0
 1
-0
-500
-0
-80
+1
+1
+-16
+16
+-16
+16
 1
 1
 1
@@ -57,12 +46,12 @@ ticks
 30.0
 
 BUTTON
-7
-46
-96
-79
+16
+58
+82
+91
 NIL
-setup\n
+setup
 NIL
 1
 T
@@ -74,10 +63,10 @@ NIL
 1
 
 BUTTON
-112
-46
-197
-79
+125
+104
+188
+137
 NIL
 go
 T
@@ -90,116 +79,135 @@ NIL
 NIL
 0
 
-PLOT
-229
-143
-744
-300
-wealth distribution
+BUTTON
+24
+269
+94
+302
+layout
+layout-spring turtles links 0.2 5 1\ntick
+T
+1
+T
+OBSERVER
 NIL
 NIL
-0.0
-500.0
-0.0
-40.0
-false
-false
-"" ""
-PENS
-"current" 5.0 1 -10899396 true "" "histogram [wealth] of turtles"
+NIL
+NIL
+0
 
-MONITOR
-599
-425
-744
-470
-wealth of bottom 50%
-sum [wealth] of min-n-of 250 turtles [wealth]
-1
-1
-11
-
-MONITOR
-608
-365
-728
-410
-wealth of top 10%
-sum [wealth] of max-n-of 50 turtles [wealth]
-1
-1
-11
-
-TEXTBOX
-563
+SLIDER
+4
+162
 176
-679
-206
-Total wealth = $50,000
-11
-0.0
+195
+num-nodes
+num-nodes
+2
+500
+100
 1
+1
+NIL
+HORIZONTAL
 
-PLOT
-229
-332
-563
-482
-wealth by percent
+MONITOR
+25
+350
+91
+395
+min-deg
+min [ count link-neighbors] of turtles
+1
+1
+11
+
+MONITOR
+110
+351
+180
+396
+max-deg
+max [count link-neighbors] of turtles
+1
+1
+11
+
+BUTTON
+17
+105
+102
+138
+go-once
+go
+NIL
+1
+T
+OBSERVER
 NIL
 NIL
-0.0
-10.0
-0.0
-10000.0
-true
-true
-"" ""
-PENS
-"top-10%" 1.0 0 -2674135 true "" "plot sum [wealth] of max-n-of 50 turtles [wealth]"
-"bottom-50%" 1.0 0 -13345367 true "" "plot sum [wealth] of min-n-of 250 turtles [wealth]"
+NIL
+NIL
+0
 
 @#$#@#$#@
 ## ACKNOWLEDGEMENT
 
-This model is from Chapter Two of the book "Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo", by Uri Wilensky & William Rand.
+This model is from Chapter Five of the book "Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo", by Uri Wilensky & William Rand.
 
-Wilensky, U & Rand, W. (2015). Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo. Cambridge, Ma. MIT Press.
+Wilensky, U. & Rand, W. (2015). Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo. Cambridge, Ma. MIT Press.
 
 This model is in the IABM Textbook folder of the NetLogo models library. The model, as well as any updates to the model, can also be found on the textbook website: http://intro-to-abm.com.
 
 ## WHAT IS IT?
 
-This model is a very simple model of economic exchange.  It is a thought experiment of  a world where, in every time step, each person gives one dollar to one other person (at random) if they have any money to give.  If they have no money then they do not give out any money.
+This is a simplified verison of the Preferential Attachment model.  It generates a network where the probability of a new link being connected to a node is proportional to the number of links the node already has.
+
+Such networks can be found in a surprisingly large range of real world situations, ranging from the connections between websites to the collaborations between actors.
+This model generates these networks by a process of “preferential attachment”, in which new network members prefer to make a connection to the more popular existing members.
 
 ## HOW IT WORKS
 
-The SETUP for the model creates 500 agents, and then gives them each 100 dollars.  At each tick, they give one dollar to another agent if they can.  If they have no money then they do nothing. Each agent also moves to an x-coordinate equal to its wealth.
+The model starts with two nodes connected by an edge.
+At each step, a new node is added. A new node picks an existing node to connect to randomly, but with some bias. More specifically, a node’s chance of being selected is directly proportional to the number of connections it already has, or its “degree.” This is the mechanism which is called “preferential attachment.”
 
 ## HOW TO USE IT
 
-Press SETUP to setup the model, then press GO to watch the model develop.
+SETUP creates two nodes and creates a link between them.
+
+GO-ONCE creates one new node and finds it a partner based on preferential attachment.
+
+GO continuously adds nodes until there are NUM-NODES nodes.
+
+The LAYOUT button attempts to move the nodes around to make the structure of the network easier to see.
 
 ## THINGS TO NOTICE
 
-Examine the various graphs and see how the model unfolds. Let it run for many ticks. The WEALTH DISTRIBUTION graph will change shape dramatically as time goes on. What happens to the WEALTH BY PERCENT graph over time?
+The networks that result from running this model are often called “scale-free” or “power law” networks. These are networks in which the distribution of the number of connections of each node is not a normal distribution — instead it follows what is a called a power law distribution. Power law distributions are different from normal distributions in that they do not have a peak at the average, and they are more likely to contain extreme values (see Albert & Barabási 2002 for a further description of the frequency and significance of scale-free networks). Barabási and Albert originally described this mechanism for creating networks, but there are other mechanisms of creating scale-free networks and so the networks created by the mechanism implemented in this model are referred to as Barabási scale-free networks.
 
 ## THINGS TO TRY
-Try running the model for many thousands of ticks. Does the distribution stabilize? How can you measure stabilization? Keep track of some individual agents. How do they move?
-
+Let the model run a little while. How many nodes are “hubs”, that is, have many connections? How many have only a few? Does some low degree node ever become a hub? How often?
+Choose a large value for the NUM-NODES slider, then allow a large network to form. Do you see a pattern as the number of nodes increases?
 
 ## EXTENDING THE MODEL
-Change the number of turtles.  Does this affect the results?
-Change the rules so agents can go into debt. Does this affect the results?
-Change the basic transaction rule of the model.  What happens if the turtles exchange more than one dollar? How about if they give a random amount to another agent at each tick? Change the rules so that the richer agents have a better chance of being given money? Or a smaller chance? How does this change the results?
+
+Assign an additional attribute to each node.  Make the probability of attachment depend on this new attribute as well as on degree.  (A bias slider could control how much the attribute influences the decision.)
 
 ## NETLOGO FEATURES
 
-This model makes extensive use of the "widget" based graph methods.
+Nodes are turtle agents and edges are link agents. 
+
+The model uses the ONE-OF primitive to chose a random link and the BOTH-ENDS primitive to select the two nodes attached to that link. 
+
+There are many ways to graphically display networks. This model uses the layout-spring primitive to implement a common method in which the movement of a node at each time step is the net result of "spring" forces that pulls connected nodes together, and repulsion forces that push all the nodes away from each other.
+
+Though it is not used in this model, there exists a network extension for NetLogo (bundled with NetLogo) that has many more network primitives. 
 
 ## RELATED MODELS
 
-This model is related to the WEALTH DISTRIBUTION model.
+See other models in the Networks section of the Models Library, such as Giant Component.
+
+See also Network Example, in the Code Examples section.
 
 ## HOW TO CITE
 
@@ -209,7 +217,7 @@ If you mention this model or the NetLogo software in a publication, we ask that 
 
 For the model itself:
 
-* Wilensky, U. (2011).  NetLogo Simple Economy model.  http://ccl.northwestern.edu/netlogo/models/IABMTextbook/SimpleEconomy.  Center for Connected Learning and Computer-Based Modeling, Northwestern University, Evanston, IL
+* Wilensky, U. & Rand, W. (2008). Preferential Attachment Simple Model.  http://ccl.northwestern.edu/netlogo/models/IABMTextbook/PreferentialAttachmentSimple.  Center for Connected Learning and Computer-Based Modeling, Northwestern University, Evanston, IL.
 
 Please cite the NetLogo software as:
 
@@ -220,9 +228,21 @@ Please cite the textbook as:
 * Wilensky, U. & Rand, W. (2015). Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo. Cambridge, Ma. MIT Press.
 
 ## CREDITS AND REFERENCES
+This model is a simplified version of the PREFERENTIAL ATTACHMENT model from the networks section of the NetLogo models library.
+Wilensky, U. (2005).  NetLogo Preferential Attachment model.  http://ccl.northwestern.edu/netlogo/models/PreferentialAttachment.  Center for Connected Learning and Computer-Based Modeling, Northwestern University, Evanston, IL.
 
-Models of this kind are described in: 
-Dragulescu, A. & V.M. Yakovenko, V.M. (2000).  Statistical Mechanics of Money. European Physics Journal B.
+Both the original and this model are based on:  
+Albert-László Barabási. Linked: The New Science of Networks, Perseus Publishing, Cambridge, Massachusetts, pages 79-92.
+
+For a more technical treatment, see:  
+Albert-László Barabási & Reka Albert. Emergence of Scaling in Random Networks, Science, Vol 286, Issue 5439, 15 October 1999, pages 509-512.
+
+Barabási's webpage has additional information at: http://www.nd.edu/~alb/
+
+The layout algorithm is based on the Fruchterman-Reingold layout algorithm.  More information about this algorithm can be obtained at: http://citeseer.ist.psu.edu/fruchterman91graph.html.
+
+For a model similar to the one described in the suggested extension, please consult:  
+W. Brian Arthur, "Urban Systems and Historical Path-Dependence", Chapt. 4 in Urban systems and Infrastructure, J. Ausubel and R. Herman (eds.), National Academy of Sciences, Washington, D.C., 1988.
 @#$#@#$#@
 default
 true
@@ -416,6 +436,22 @@ Polygon -7500403 true true 135 105 90 60 45 45 75 105 135 135
 Polygon -7500403 true true 165 105 165 135 225 105 255 45 210 60
 Polygon -7500403 true true 135 90 120 45 150 15 180 45 165 90
 
+sheep
+false
+15
+Circle -1 true true 203 65 88
+Circle -1 true true 70 65 162
+Circle -1 true true 150 105 120
+Polygon -7500403 true false 218 120 240 165 255 165 278 120
+Circle -7500403 true false 214 72 67
+Rectangle -1 true true 164 223 179 298
+Polygon -1 true true 45 285 30 285 30 240 15 195 45 210
+Circle -1 true true 3 83 150
+Rectangle -1 true true 65 221 80 296
+Polygon -1 true true 195 285 210 285 210 240 240 210 195 210
+Polygon -7500403 true false 276 85 285 105 302 99 294 83
+Polygon -7500403 true false 219 85 210 105 193 99 201 83
+
 square
 false
 0
@@ -499,6 +535,13 @@ Line -7500403 true 216 40 79 269
 Line -7500403 true 40 84 269 221
 Line -7500403 true 40 216 269 79
 Line -7500403 true 84 40 221 269
+
+wolf
+false
+0
+Polygon -16777216 true false 253 133 245 131 245 133
+Polygon -7500403 true true 2 194 13 197 30 191 38 193 38 205 20 226 20 257 27 265 38 266 40 260 31 253 31 230 60 206 68 198 75 209 66 228 65 243 82 261 84 268 100 267 103 261 77 239 79 231 100 207 98 196 119 201 143 202 160 195 166 210 172 213 173 238 167 251 160 248 154 265 169 264 178 247 186 240 198 260 200 271 217 271 219 262 207 258 195 230 192 198 210 184 227 164 242 144 259 145 284 151 277 141 293 140 299 134 297 127 273 119 270 105
+Polygon -7500403 true true -1 195 14 180 36 166 40 153 53 140 82 131 134 133 159 126 188 115 227 108 236 102 238 98 268 86 269 92 281 87 269 103 269 113
 
 x
 false

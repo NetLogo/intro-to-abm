@@ -1,55 +1,198 @@
-turtles-own [wealth]
+extensions [ gis ]            ;; the gis extension allows us to read standard GIS data
+
+breed [ consumers consumer ]  ;; consumers are the ones purchasing tickets
+breed [ venues venue ]        ;; where the event will occur
+
+consumers-own [
+  bought?                     ;; whether or not they have bought a ticket
+  my-uncertainty              ;; uncertainty in the underlying quality of the event
+  my-expected-value           ;; what they expect to get out of the event
+]
+
+patches-own [
+  tract-id                    ;; maps the patch on to a census track
+  population                  ;; number of households on the patch
+]
+
+globals [
+  event-quality-this-week     ;; the actual quality of the event
+  nyc-roads-dataset           ;; GIS data file for roads
+  nyc-tracts-dataset          ;; GIS data file for the census tracts
+  roads-displayed?            ;; a boolean that controls whether or not the roads are being displayed
+]
 
 to setup
   clear-all
-  create-turtles 500 [
-    set wealth 100
-    set shape "circle"
-    set color green
-    set size 2 
-
-  ;;  visualize the turtles from left to right in ascending order of wealth 
-    setxy wealth random-ycor 
+  setup-maps  ;; load in the GIS data
+  ask patches with [ population > 0 ] [
+    ;; create the consumers, this creates one household for every 100 in the census data in order to speed up processing
+    sprout-consumers population / 100 [
+      set my-uncertainty consumer-uncertainty
+      set my-expected-value consumer-expected-value
+      set bought? false
+      set shape "person"
+      set color white
+      set heading random 360
+      fd 0.1
+    ]
   ]
+  create-venue ;; create the venue for the event
   reset-ticks
 end
 
+;; create-venue chooses a random location where there is a household and places the venue there
+;;  since we know that all consumers live inside the space of the model this simplifies the
+;;  process of finding a point located in the gis data space
+to create-venue
+  create-venues 1 [
+    set shape "house"
+    set color yellow
+    set size 2
+    let target one-of consumers
+    set xcor [ xcor ] of target
+    set ycor [ ycor ] of target
+  ]
+end
+
+;; reset-sale sets the status of all consumers to not having been bought, kills the venue and creates a new one
+to reset-event
+  ask consumers [
+    set bought? false
+    set color white
+  ]
+  ask venues [
+    die
+  ]
+  create-venue
+  clear-all-plots
+  reset-ticks
+end
 
 to go
-  ;; transact and then update your location
-  ask turtles with [wealth > 0] [transact]
-  ;; prevent wealthy turtles from moving too far to the right
-  ask turtles [if wealth <= max-pxcor [set xcor wealth] ]
+  ;; if all consumers have bought or if time has run out then stop the simulation
+  if all? consumers [ bought? ] or fraction-of-time-left <= 0 [
+    stop
+  ]
+  ;; consumers who have not bought are given a chance to buy
+  ask consumers with [ not bought? ] [
+    if random-float 1.0 < willingness-to-buy [
+      buy
+    ]
+  ]
   tick
 end
 
-to transact
-  ;; give a dollar to another turtle
-  set wealth wealth - 1
-  ask one-of other turtles [set wealth wealth + 1]
+to load-patch-data
+  ;; We check to make sure the file exists first
+  ifelse file-exists? "data/households.txt"
+  [
+    file-open "data/households.txt"
+    ;; Read in all the data in the file
+    while [ not file-at-end? ]
+    [
+      let geo_id file-read
+      let geo_id2 file-read
+      let sumlevel file-read
+      let geo_name file-read
+      let household-population file-read
+      ;; set the population of a patch based on the population of the tract
+      ask patches with [ tract-id = geo_id2 ] [
+        set population read-from-string household-population
+      ]
+    ]
+    ;; since multiple patches could be part of the same census tract, this code divides the households up evenly among all
+    ;;  patches that are part of the same census tract
+    ask patches with [ population > 0 ] [
+      set population population / count patches with [ tract-id = [ tract-id ] of myself ]
+    ]
+    ;; Done reading in patch information.  Close the file.
+    file-close
+  ]
+  [ user-message "There is no data/households.txt file in current directory!" ]
+end
+
+to setup-maps
+  ; Load all of our datasets
+  set nyc-roads-dataset gis:load-dataset "data/roads.shp"
+  set nyc-tracts-dataset gis:load-dataset "data/tracts.shp"
+  ; Set the world envelope to the union of all of our dataset's envelopes
+  gis:set-world-envelope (gis:envelope-union-of (gis:envelope-of nyc-roads-dataset) (gis:envelope-of nyc-tracts-dataset))
+  set roads-displayed? false
+
+  display-roads  ;; display the roads  
+  display-tracts ;; display the tract borders
+
+  ;; locate whether a patch intersects a tract, if it does assign it that tract
+  foreach gis:feature-list-of nyc-tracts-dataset [
+    ask patches gis:intersecting ? [
+      set tract-id gis:property-value ? "STFID"
+    ]
+  ]
+
+  ;; load the census data in to the patches
+  load-patch-data
+end
+
+to display-roads
+  ifelse roads-displayed? [
+    ;; if the roads aren't displayed clear the drawing and reload the census tract borders
+    clear-drawing
+    display-tracts
+    set roads-displayed? false
+  ][
+    ;; if they are then draw the streets in red
+    gis:set-drawing-color red
+    set roads-displayed? true
+    gis:draw nyc-roads-dataset 1
+  ]
+end
+
+to display-tracts
+  ;; draw the census tracts in blue
+  gis:set-drawing-color blue
+  gis:draw nyc-tracts-dataset 1
+end
+
+to-report willingness-to-buy
+  ;; willingness-to-buy is a factor of the uncertainty the consumer has in the event, the time left, and how close the consumer
+  ;;   is to the venue
+  let my-discounted-certainty (1 - my-uncertainty) * fraction-of-time-left
+  let nearness (1 - distance-sensitivity) ^ (distance one-of venues)
+  report my-expected-value * my-discounted-certainty * nearness
+end
+
+;; this normalizes the amount of time left between 0 and 1
+to-report fraction-of-time-left
+  report (event-week - ticks) / (event-week)
+end
+
+;; to buy update the variables and change the color of the consumer
+to buy
+  set bought? true
+  set color green
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-233
-16
-744
-128
+261
+10
+776
+796
 -1
 -1
-1.0
+5.0
 1
 10
 1
 1
 1
 0
-0
-0
+1
+1
 1
 0
-500
+100
 0
-80
+150
 1
 1
 1
@@ -57,12 +200,12 @@ ticks
 30.0
 
 BUTTON
-7
-46
-96
-79
-NIL
-setup\n
+15
+185
+100
+218
+setup
+setup
 NIL
 1
 T
@@ -74,10 +217,10 @@ NIL
 1
 
 BUTTON
-112
-46
-197
-79
+105
+185
+240
+218
 NIL
 go
 T
@@ -91,73 +234,116 @@ NIL
 0
 
 PLOT
-229
-143
-744
-300
-wealth distribution
-NIL
-NIL
-0.0
-500.0
-0.0
-40.0
-false
-false
-"" ""
-PENS
-"current" 5.0 1 -10899396 true "" "histogram [wealth] of turtles"
-
-MONITOR
-599
-425
-744
-470
-wealth of bottom 50%
-sum [wealth] of min-n-of 250 turtles [wealth]
-1
-1
-11
-
-MONITOR
-608
-365
-728
-410
-wealth of top 10%
-sum [wealth] of max-n-of 50 turtles [wealth]
-1
-1
-11
-
-TEXTBOX
-563
-176
-679
-206
-Total wealth = $50,000
-11
-0.0
-1
-
-PLOT
-229
-332
-563
-482
-wealth by percent
-NIL
-NIL
+15
+285
+240
+435
+Tickets vs. Time
+Time
+Tickets
 0.0
 10.0
 0.0
-10000.0
+10.0
 true
-true
+false
 "" ""
 PENS
-"top-10%" 1.0 0 -2674135 true "" "plot sum [wealth] of max-n-of 50 turtles [wealth]"
-"bottom-50%" 1.0 0 -13345367 true "" "plot sum [wealth] of min-n-of 250 turtles [wealth]"
+"default" 1.0 0 -16777216 true "" "plot count consumers with [ bought? ]"
+
+SLIDER
+15
+60
+240
+93
+consumer-uncertainty
+consumer-uncertainty
+0
+1.0
+0.15
+.01
+1
+NIL
+HORIZONTAL
+
+SLIDER
+15
+100
+240
+133
+consumer-expected-value
+consumer-expected-value
+0
+1
+1
+.01
+1
+NIL
+HORIZONTAL
+
+SLIDER
+15
+20
+240
+53
+event-week
+event-week
+0
+100
+15
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+15
+140
+240
+173
+distance-sensitivity
+distance-sensitivity
+0
+1.0
+0.15
+0.01
+1
+NIL
+HORIZONTAL
+
+BUTTON
+105
+225
+240
+258
+toggle road display
+display-roads
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+0
+
+BUTTON
+15
+225
+100
+258
+NIL
+reset-event
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+0
 
 @#$#@#$#@
 ## ACKNOWLEDGEMENT
@@ -166,63 +352,69 @@ This model is from Chapter Two of the book "Introduction to Agent-Based Modeling
 
 Wilensky, U & Rand, W. (2015). Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo. Cambridge, Ma. MIT Press.
 
-This model is in the IABM Textbook folder of the NetLogo models library. The model, as well as any updates to the model, can also be found on the textbook website: http://intro-to-abm.com.
+This model is in the IABM Textbook folder of the NetLogo models library. The model, as well as any updates or errata, can also be found on the textbook website: http://intro-to-abm.com
 
 ## WHAT IS IT?
 
-This model is a very simple model of economic exchange.  It is a thought experiment of  a world where, in every time step, each person gives one dollar to one other person (at random) if they have any money to give.  If they have no money then they do not give out any money.
+The general intent of this model is to simulate how individuals within a limited geographic region decide to buy tickets to a live event.
+
 
 ## HOW IT WORKS
 
-The SETUP for the model creates 500 agents, and then gives them each 100 dollars.  At each tick, they give one dollar to another agent if they can.  If they have no money then they do nothing. Each agent also moves to an x-coordinate equal to its wealth.
+During setup, census tract definitions and census tract data are read from external files. The GIS extension is used to read in the tract definitions. The data is read from census files. After this data is read in, households are created in each patch to represent the underlying population present in those location. Finally, a venue is randomly created somewhere in the space.
+
+Once the model runs, in each time step, agents who have not bought tickets calculate the expected utility of attending the event. Then, based on that probability, they decide whether or not to buy the ticket at that time step. This random draw simulates the fact that the particular period in which they decide or not to buy the ticket is stochastic. To make it more realistic you can elaborate the model so that it determines who buys early and who buys late.
+
 
 ## HOW TO USE IT
 
-Press SETUP to setup the model, then press GO to watch the model develop.
+To run the model, simply set the parameters and let the model run. If after running the model you want to view a different setup with the same parameters, use the RESET-SALE button. Since the GIS data can take a while to load this is a faster way to examine multiple runs.
+
+EVENT-WEEK controls how many weeks until the event occurs.
+
+CONSUMER-UNCERTAINTY controls how uncertain the consumers are in the quality of the event.
+
+CONSUMER-EXPECTED-VALUE controls what value the consumers expect to get out of attending the event.
+
+DISTANCE-SENSITIVITY controls how sensitive consumers are about the distance they are from the event.
+
 
 ## THINGS TO NOTICE
 
-Examine the various graphs and see how the model unfolds. Let it run for many ticks. The WEALTH DISTRIBUTION graph will change shape dramatically as time goes on. What happens to the WEALTH BY PERCENT graph over time?
+The basic pattern grows outward from the venue.
+
+The density of sales decreases as we get further away from the venue.
+
+The number of sales increases quickly at first, and then slows down.
+
 
 ## THINGS TO TRY
-Try running the model for many thousands of ticks. Does the distribution stabilize? How can you measure stabilization? Keep track of some individual agents. How do they move?
+
+Adjust the CONSUMER-UNCERTAINTY and CONSUMER-EXPECTED-VALUE and see how it affects the results. Number of sales should increase as uncertainty decreases and should decrease as the expected value decreases.
 
 
 ## EXTENDING THE MODEL
-Change the number of turtles.  Does this affect the results?
-Change the rules so agents can go into debt. Does this affect the results?
-Change the basic transaction rule of the model.  What happens if the turtles exchange more than one dollar? How about if they give a random amount to another agent at each tick? Change the rules so that the richer agents have a better chance of being given money? Or a smaller chance? How does this change the results?
+
+Make the process of when consumers buy less stochastic.
+
+Add pricing tiers.
+
 
 ## NETLOGO FEATURES
 
-This model makes extensive use of the "widget" based graph methods.
+This model demonstrates the use of the NetLogo GIS extension. It uses the extension to load two GIS datasets for New York City: one for the census tracts and one for the roads. Information about the population in the various census tracts is then loaded from a text file using NetLogo's `file-*` primitives.
+
 
 ## RELATED MODELS
 
-This model is related to the WEALTH DISTRIBUTION model.
+GIS General Examples
 
-## HOW TO CITE
-
-This model is part of the textbook, “Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo.”
-
-If you mention this model or the NetLogo software in a publication, we ask that you include the citations below.
-
-For the model itself:
-
-* Wilensky, U. (2011).  NetLogo Simple Economy model.  http://ccl.northwestern.edu/netlogo/models/IABMTextbook/SimpleEconomy.  Center for Connected Learning and Computer-Based Modeling, Northwestern University, Evanston, IL
-
-Please cite the NetLogo software as:
-
-* Wilensky, U. (1999). NetLogo. http://ccl.northwestern.edu/netlogo/. Center for Connected Learning and Computer-Based Modeling, Northwestern University, Evanston, IL.
-
-Please cite the textbook as:
-
-* Wilensky, U. & Rand, W. (2015). Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo. Cambridge, Ma. MIT Press.
 
 ## CREDITS AND REFERENCES
 
-Models of this kind are described in: 
-Dragulescu, A. & V.M. Yakovenko, V.M. (2000).  Statistical Mechanics of Money. European Physics Journal B.
+This model was inspired by the work of Peggy Tseng and Wendy Moe. Especially, Peggy's dissertation:
+
+Tseng, P. (2009) Effects of Performance Schedules on Event Ticket Sales. Dissertation, University of Maryland Robert H. Smith School of Business. Chair: Moe, W.
 @#$#@#$#@
 default
 true
@@ -525,5 +717,5 @@ Line -7500403 true 150 150 90 180
 Line -7500403 true 150 150 210 180
 
 @#$#@#$#@
-0
+1
 @#$#@#$#@

@@ -1,55 +1,65 @@
-turtles-own [wealth]
+turtles-own [
+  message?  ;; true or false: has this turtle gotten the message yet?
+]
 
 to setup
   clear-all
   create-turtles 500 [
-    set wealth 100
-    set shape "circle"
-    set color green
-    set size 2 
-
-  ;;  visualize the turtles from left to right in ascending order of wealth 
-    setxy wealth random-ycor 
+    set message? false
+    setxy random-xcor random-ycor
+    set size 2
+  ]
+  ask one-of turtles [
+    set message? true  ;; give the message to one of the turtles
+  ]
+  ask turtles [
+    recolor  ;; color the turtles according to whether they have the message
+    create-links-with n-of links-per-node other turtles
   ]
   reset-ticks
 end
 
-
 to go
-  ;; transact and then update your location
-  ask turtles with [wealth > 0] [transact]
-  ;; prevent wealthy turtles from moving too far to the right
-  ask turtles [if wealth <= max-pxcor [set xcor wealth] ]
+  if all? turtles [ message? ] [ stop ]
+  ask turtles [ communicate ]
+  ask turtles [ recolor ]
   tick
 end
 
-to transact
-  ;; give a dollar to another turtle
-  set wealth wealth - 1
-  ask one-of other turtles [set wealth wealth + 1]
+;; the core procedure!
+to communicate  ;; turtle procedure
+  if any? link-neighbors with [ message? ]
+    [ set message? true ]
+end
+
+;; color turtles with message red, and those without message blue
+to recolor  ;; turtle procedure
+  ifelse message?
+    [ set color red ]
+    [ set color blue ]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-233
-16
-744
-128
--1
--1
-1.0
-1
+230
 10
+728
+529
+30
+30
+8.0
+1
+13
 1
 1
 1
 0
-0
-0
 1
-0
-500
-0
-80
+1
+1
+-30
+30
+-30
+30
 1
 1
 1
@@ -57,12 +67,12 @@ ticks
 30.0
 
 BUTTON
-7
-46
-96
-79
+10
+40
+110
+73
 NIL
-setup\n
+setup
 NIL
 1
 T
@@ -73,11 +83,22 @@ NIL
 NIL
 1
 
+MONITOR
+10
+165
+220
+210
+turtles with message
+count turtles with [ message? ]
+3
+1
+11
+
 BUTTON
-112
-46
-197
-79
+120
+40
+220
+73
 NIL
 go
 T
@@ -90,139 +111,105 @@ NIL
 NIL
 0
 
-PLOT
-229
-143
-744
-300
-wealth distribution
-NIL
-NIL
-0.0
-500.0
-0.0
-40.0
-false
-false
-"" ""
-PENS
-"current" 5.0 1 -10899396 true "" "histogram [wealth] of turtles"
-
-MONITOR
-599
-425
-744
-470
-wealth of bottom 50%
-sum [wealth] of min-n-of 250 turtles [wealth]
-1
-1
-11
-
-MONITOR
-608
-365
-728
-410
-wealth of top 10%
-sum [wealth] of max-n-of 50 turtles [wealth]
-1
-1
-11
-
-TEXTBOX
-563
-176
-679
-206
-Total wealth = $50,000
-11
-0.0
-1
+CHOOSER
+10
+85
+220
+130
+links-per-node
+links-per-node
+1 2
+0
 
 PLOT
-229
-332
-563
-482
-wealth by percent
+10
+220
+220
+370
+turtles with message
 NIL
 NIL
 0.0
 10.0
 0.0
-10000.0
+500.0
 true
-true
+false
 "" ""
 PENS
-"top-10%" 1.0 0 -2674135 true "" "plot sum [wealth] of max-n-of 50 turtles [wealth]"
-"bottom-50%" 1.0 0 -13345367 true "" "plot sum [wealth] of min-n-of 250 turtles [wealth]"
+"default" 1.0 0 -2674135 true "" "plot count turtles with [ message? ]"
 
 @#$#@#$#@
 ## ACKNOWLEDGEMENT
 
-This model is from Chapter Two of the book "Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo", by Uri Wilensky & William Rand.
+This model is from Chapter Five of the book "Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo", by Uri Wilensky & William Rand.
 
-Wilensky, U & Rand, W. (2015). Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo. Cambridge, Ma. MIT Press.
+Wilensky, U. & Rand, W. (2015). Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo. Cambridge, Ma. MIT Press.
 
 This model is in the IABM Textbook folder of the NetLogo models library. The model, as well as any updates to the model, can also be found on the textbook website: http://intro-to-abm.com.
 
 ## WHAT IS IT?
 
-This model is a very simple model of economic exchange.  It is a thought experiment of  a world where, in every time step, each person gives one dollar to one other person (at random) if they have any money to give.  If they have no money then they do not give out any money.
+This code example is a variation on the Communication-T-T Example in the Code Examples section of the NetLogo models library. In the original code example, the turtles passed messages to nearby turtles. In this version, the turtles pass messages through a network. One turtle starts out with a message (the red turtle) and she spreads the message to other turtles she is linked with. When a turtle gets the message, it turns red.
+
+The monitor keeps track of how many turtles have the message by reporting:
+
+    count turtles with [ message? ]
+
+The plot helps you visualize how this value changes through time.
+
 
 ## HOW IT WORKS
 
-The SETUP for the model creates 500 agents, and then gives them each 100 dollars.  At each tick, they give one dollar to another agent if they can.  If they have no money then they do nothing. Each agent also moves to an x-coordinate equal to its wealth.
+SETUP creates 500 turtles and gives them random coordinates in the world.
+Each turtle creates links with two other turtles, to form a network. One of the turtles is given a message, and is colored red to indicate that it has the message.
+In the GO procedure, the turtles pass messages. The way this is done is that each turtle queries the turtles it is linked with. If any of them have the message then the querying turtle gets the message. All turtles that have the message are colored red.
+
+The network is formed randomly, by asking each turtle to create links with either one or two other turtles, depending on the value chosen for LINKS-PER-NODE.
+
 
 ## HOW TO USE IT
 
-Press SETUP to setup the model, then press GO to watch the model develop.
+Choose the value of LINKS-PER-NODE to characterize the network. Press SETUP to create the turtles and the network linking them and give one turtle the message. Then press GO to watch the message spread through the network.
+
 
 ## THINGS TO NOTICE
 
-Examine the various graphs and see how the model unfolds. Let it run for many ticks. The WEALTH DISTRIBUTION graph will change shape dramatically as time goes on. What happens to the WEALTH BY PERCENT graph over time?
+Is the pattern of diffusion different or the same as the non-network version of this model? If it's different, can you explain why?
 
-## THINGS TO TRY
-Try running the model for many thousands of ticks. Does the distribution stabilize? How can you measure stabilization? Keep track of some individual agents. How do they move?
+Do you notice any difference between the pattern of transmission when LINKS-PER-NODE is 1 versus the pattern when LINKS-PER-NODE is 2?
+
+One thing you may notice is that, when LINKS-PER-NODE is 1, it sometimes happen that not all turtles get the message. Do you understand why that happens? It never happens with the non-network version of this model. Can you explain why?
+
+Finally, do you think it is possible that not all turtles get the message when LINKS-PER-NODE is 2? Could you design a BehaviorSpace experiment that would help you answer this question?
 
 
 ## EXTENDING THE MODEL
-Change the number of turtles.  Does this affect the results?
-Change the rules so agents can go into debt. Does this affect the results?
-Change the basic transaction rule of the model.  What happens if the turtles exchange more than one dollar? How about if they give a random amount to another agent at each tick? Change the rules so that the richer agents have a better chance of being given money? Or a smaller chance? How does this change the results?
+
+Wouldn't it be nice if you could compare the pattern of transmission with one link per node _directly_ with the pattern for two links per node?
+
+An easy way of doing that would be to create two different [breeds](http://ccl.northwestern.edu/netlogo/5.0/docs/programming.html#breeds) of turtles and modify the SETUP procedure to ask each of these breeds to create links with other turtles of the _same_ breed only: one link for turtles of the first breed and two links for the second breed. This way, you would have two entirely separate networks. The code for COMMUNICATE and RECOLOR would not have to be changed at all.
+
+You could then modify the plot to have two different plot pens: one for the first breed and one for the second breed. This would allow you to compare the two patterns visually.
+
+If you want to push things a step further, how about allowing the user to compare a _variable_ number of networks, each with a different number of links per node? You could not declare a separate breed for each network, because you would not know in advance how many there needs to be. The same will be true of plot pens. Can you think of any ways to solve these problems?
+
+The model currently stops when all turtles have received the message. However, sometimes the network is constructed in such a way that some turtles will never receive the message. Try to modify the code so that the model stops when this is the case.
+
 
 ## NETLOGO FEATURES
 
-This model makes extensive use of the "widget" based graph methods.
+This model uses turtle agents and link agents to represent a network.
+
+The network is generated randomly, using the [`n-of`](http://ccl.northwestern.edu/netlogo/docs/dictionary.html#n-of) primitive, which allows you to randomly select a variable number of agents from a list or an agentset. In this case, the number of agents selected by `n-of` is given by the LINKS-PER-NODE chooser.
+
+This is not the only way to generate random networks. The Random Network model, from the same IABM chapter, shows you three other ways to do it. You can also use [the network extension](http://ccl.northwestern.edu/netlogo/docs/nw.html) to generate networks.
 
 ## RELATED MODELS
 
-This model is related to the WEALTH DISTRIBUTION model.
-
-## HOW TO CITE
-
-This model is part of the textbook, “Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo.”
-
-If you mention this model or the NetLogo software in a publication, we ask that you include the citations below.
-
-For the model itself:
-
-* Wilensky, U. (2011).  NetLogo Simple Economy model.  http://ccl.northwestern.edu/netlogo/models/IABMTextbook/SimpleEconomy.  Center for Connected Learning and Computer-Based Modeling, Northwestern University, Evanston, IL
-
-Please cite the NetLogo software as:
-
-* Wilensky, U. (1999). NetLogo. http://ccl.northwestern.edu/netlogo/. Center for Connected Learning and Computer-Based Modeling, Northwestern University, Evanston, IL.
-
-Please cite the textbook as:
-
-* Wilensky, U. & Rand, W. (2015). Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo. Cambridge, Ma. MIT Press.
+Communication T-T Example
 
 ## CREDITS AND REFERENCES
-
-Models of this kind are described in: 
-Dragulescu, A. & V.M. Yakovenko, V.M. (2000).  Statistical Mechanics of Money. European Physics Journal B.
 @#$#@#$#@
 default
 true
@@ -525,5 +512,5 @@ Line -7500403 true 150 150 90 180
 Line -7500403 true 150 150 210 180
 
 @#$#@#$#@
-0
+1
 @#$#@#$#@

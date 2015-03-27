@@ -1,84 +1,66 @@
-turtles-own [wealth]
+turtles-own [speed]
 
 to setup
-  clear-all
-  create-turtles 500 [
-    set wealth 100
-    set shape "circle"
-    set color green
-    set size 2 
-
-  ;;  visualize the turtles from left to right in ascending order of wealth 
-    setxy wealth random-ycor 
-  ]
+  setup-circle 
   reset-ticks
 end
 
+to setup-circle 
+  clear-all
+  set-default-shape turtles "arrow"
+  ;; turtles should be evenly spaced around the circle
+  create-ordered-turtles 40 [
+    set size 2  ;; easier to see
+    set speed .35  ;; this is the size of each step the turtles take in a tick
+    fd 20  ;; move turtles to perimeter of circle
+    rt 90  ;; turtles face tangent to the circle
+  ]
+end
 
 to go
-  ;; transact and then update your location
-  ask turtles with [wealth > 0] [transact]
-  ;; prevent wealthy turtles from moving too far to the right
-  ask turtles [if wealth <= max-pxcor [set xcor wealth] ]
+  ;; move forward then turn
+  ask turtles [fd speed rt 1 ]
   tick
 end
 
-to transact
-  ;; give a dollar to another turtle
-  set wealth wealth - 1
-  ask one-of other turtles [set wealth wealth + 1]
+
+to change-speed
+  ask turtles [set speed speed + .15]   ;; increase the step-size to .5
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-233
-16
-744
-128
--1
--1
-1.0
+266
+10
+731
+496
+45
+45
+5.0
 1
 10
 1
 1
 1
 0
-0
-0
-1
-0
-500
-0
-80
 1
 1
 1
+-45
+45
+-45
+45
+1
+1
+0
 ticks
 30.0
 
 BUTTON
-7
-46
-96
-79
-NIL
-setup\n
-NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
-BUTTON
-112
-46
-197
-79
-NIL
+60
+85
+152
+118
+go
 go
 T
 1
@@ -90,79 +72,61 @@ NIL
 NIL
 0
 
-PLOT
-229
-143
-744
-300
-wealth distribution
+BUTTON
+60
+45
+153
+78
+setup
+setup
+NIL
+1
+T
+OBSERVER
 NIL
 NIL
-0.0
-500.0
-0.0
-40.0
-false
-false
-"" ""
-PENS
-"current" 5.0 1 -10899396 true "" "histogram [wealth] of turtles"
-
-MONITOR
-599
-425
-744
-470
-wealth of bottom 50%
-sum [wealth] of min-n-of 250 turtles [wealth]
-1
-1
-11
-
-MONITOR
-608
-365
-728
-410
-wealth of top 10%
-sum [wealth] of max-n-of 50 turtles [wealth]
-1
-1
-11
-
-TEXTBOX
-563
-176
-679
-206
-Total wealth = $50,000
-11
-0.0
-1
-
-PLOT
-229
-332
-563
-482
-wealth by percent
 NIL
 NIL
-0.0
-10.0
-0.0
-10000.0
-true
-true
-"" ""
-PENS
-"top-10%" 1.0 0 -2674135 true "" "plot sum [wealth] of max-n-of 50 turtles [wealth]"
-"bottom-50%" 1.0 0 -13345367 true "" "plot sum [wealth] of min-n-of 250 turtles [wealth]"
+1
+
+BUTTON
+45
+150
+165
+183
+NIL
+change-speed
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+0
+
+BUTTON
+60
+220
+155
+253
+track turtle
+ask one-of turtles [pen-down]
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+0
 
 @#$#@#$#@
 ## ACKNOWLEDGEMENT
 
-This model is from Chapter Two of the book "Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo", by Uri Wilensky & William Rand.
+This model is from Chapter Zero of the book "Introduction to Agent-Based Modeling: Modeling natural, social and engineered complex systems with NetLogo", by Uri Wilensky & William Rand.
 
 Wilensky, U & Rand, W. (2015). Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo. Cambridge, Ma. MIT Press.
 
@@ -170,36 +134,53 @@ This model is in the IABM Textbook folder of the NetLogo models library. The mod
 
 ## WHAT IS IT?
 
-This model is a very simple model of economic exchange.  It is a thought experiment of  a world where, in every time step, each person gives one dollar to one other person (at random) if they have any money to give.  If they have no money then they do not give out any money.
+
+This is a kind of mathematical investigation — we are investigating the emergent shape created by the movement of many turtles (arrows) moving independently in simple ways. Each turtle is moving a little step forward and taking a little turn right to stay on a circle of radius 20.  What happens if the we slightly increase the step forward they are taking  in mid-action? Guess before you try it.
 
 ## HOW IT WORKS
-
-The SETUP for the model creates 500 agents, and then gives them each 100 dollars.  At each tick, they give one dollar to another agent if they can.  If they have no money then they do nothing. Each agent also moves to an x-coordinate equal to its wealth.
+We start with 40 turtles on a circle of radius 20 facing clockwise around the circle.
+The turtles move forward .35 units and turn right 1 degree to stay on the circle. 
 
 ## HOW TO USE IT
 
-Press SETUP to setup the model, then press GO to watch the model develop.
+The SETUP button creates 40 turtles on a circle of radius 20 centered at the point (0 0). The turtles are all facing around the circle.
+
+The GO button starts the turtles circling. They move around the circle.
+
+The CHANGE-SPEED button increase the turtles' step size to .5 units.  *Before* you do it, what is your guess as to what will happen when you change the step-size?
+
+The TRACK-TURTLE button selects one turtle at random to draw its path, so you can keep better track of its movement.
 
 ## THINGS TO NOTICE
 
-Examine the various graphs and see how the model unfolds. Let it run for many ticks. The WEALTH DISTRIBUTION graph will change shape dramatically as time goes on. What happens to the WEALTH BY PERCENT graph over time?
+What is happening to the shape described by the turtles?
+
+How far out do the turtles go?
+
+How far in do they come?
 
 ## THINGS TO TRY
-Try running the model for many thousands of ticks. Does the distribution stabilize? How can you measure stabilization? Keep track of some individual agents. How do they move?
 
+In the Command Center, try the command `lt 50` while the turtles are circling. Is this the same behavior as you observed when changing the speed?
+
+Get a single (or several) turtles to trace their path using the command `pen-down` (`pd`).  This may help to show the relationship between the movement of individual turtles and the circle you see as they all move together.
 
 ## EXTENDING THE MODEL
-Change the number of turtles.  Does this affect the results?
-Change the rules so agents can go into debt. Does this affect the results?
-Change the basic transaction rule of the model.  What happens if the turtles exchange more than one dollar? How about if they give a random amount to another agent at each tick? Change the rules so that the richer agents have a better chance of being given money? Or a smaller chance? How does this change the results?
 
-## NETLOGO FEATURES
+What tools can you build to help visualize what is going on?
 
-This model makes extensive use of the "widget" based graph methods.
+Can you add a plot to show a turtle's distance from the origin as the turtles circle?
+
+Can you stop all the turtles and focus on only one turtle's movement?
+
+Can you draw a circle (with a turtle's pen) on the screen to serve as a baseline?
+
+Make sliders to control the original radius and/or the number of turtles.
 
 ## RELATED MODELS
 
-This model is related to the WEALTH DISTRIBUTION model.
+This model is a simplification of the Turtles Circling Model in the Mathematics section of the NetLogo models library.
+
 
 ## HOW TO CITE
 
@@ -209,7 +190,7 @@ If you mention this model or the NetLogo software in a publication, we ask that 
 
 For the model itself:
 
-* Wilensky, U. (2011).  NetLogo Simple Economy model.  http://ccl.northwestern.edu/netlogo/models/IABMTextbook/SimpleEconomy.  Center for Connected Learning and Computer-Based Modeling, Northwestern University, Evanston, IL
+* Wilensky, U. (1997).  NetLogo Turtles Circling Simple model.  http://ccl.northwestern.edu/netlogo/models/IABMTextbook/TurtlesCirclingSimple.  Center for Connected Learning and Computer-Based Modeling, Northwestern Institute on Complex Systems, Northwestern University, Evanston, IL
 
 Please cite the NetLogo software as:
 
@@ -217,12 +198,9 @@ Please cite the NetLogo software as:
 
 Please cite the textbook as:
 
-* Wilensky, U. & Rand, W. (2015). Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo. Cambridge, Ma. MIT Press.
+* Wilensky, U & Rand, W. (2015). Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo. Cambridge, Ma. MIT Press.
 
 ## CREDITS AND REFERENCES
-
-Models of this kind are described in: 
-Dragulescu, A. & V.M. Yakovenko, V.M. (2000).  Statistical Mechanics of Money. European Physics Journal B.
 @#$#@#$#@
 default
 true
@@ -509,6 +487,11 @@ Polygon -7500403 true true 30 75 75 30 270 225 225 270
 @#$#@#$#@
 NetLogo 5.2.0-RC4
 @#$#@#$#@
+setup
+repeat 400 [ all-circle ]
+ask turtles [ pen-down ]
+set radius 20
+repeat 200 [ all-circle ]
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
@@ -525,5 +508,5 @@ Line -7500403 true 150 150 90 180
 Line -7500403 true 150 150 210 180
 
 @#$#@#$#@
-0
+1
 @#$#@#$#@

@@ -1,55 +1,78 @@
-turtles-own [wealth]
+patches-own
+[
+  vote   ;; my vote (0 or 1)
+  total  ;; sum of votes around me
+]
 
 to setup
   clear-all
-  create-turtles 500 [
-    set wealth 100
-    set shape "circle"
-    set color green
-    set size 2 
-
-  ;;  visualize the turtles from left to right in ascending order of wealth 
-    setxy wealth random-ycor 
-  ]
+  ask patches
+    [ set vote random 2 ;; set vote to either 0 or 1
+      recolor-patch ]
   reset-ticks
+  check-setup
 end
 
-
 to go
-  ;; transact and then update your location
-  ask turtles with [wealth > 0] [transact]
-  ;; prevent wealthy turtles from moving too far to the right
-  ask turtles [if wealth <= max-pxcor [set xcor wealth] ]
+  ask patches
+    [ set total (sum [ vote ] of neighbors) ]
+  ;; use two ask patches blocks so all patches compute "total"
+  ;; before any patches change their votes
+  ask patches
+    [ if total > 5 [ set vote 1 ]
+      if total < 3 [ set vote 0 ]
+      if total = 4
+        [ if change-vote-if-tied?
+          [ set vote (1 - vote) ] ] ;; invert the vote
+      if total = 5
+        [ ifelse award-close-calls-to-loser?
+          [ set vote 0 ]
+          [ set vote 1 ] ]
+      if total = 3
+        [ ifelse award-close-calls-to-loser?
+          [ set vote 1 ]
+          [ set vote 0 ] ]
+      recolor-patch ]
   tick
 end
 
-to transact
-  ;; give a dollar to another turtle
-  set wealth wealth - 1
-  ask one-of other turtles [set wealth wealth + 1]
+to recolor-patch  ;; patch procedure
+  ifelse vote = 0
+    [ set pcolor green ]
+    [ set pcolor blue ]
+end
+
+;; This procedure checks to see if the SETUP procedure sets up the model with roughly
+;; equal numbers of blue and green patches
+to check-setup
+  ;; count the difference between the number of green and the number of blue patches
+  let diff abs (count patches with [ vote = 0 ] - count patches with [ vote = 1 ])
+  if diff > .1 * count patches [
+    print "Warning: Difference in initial voters is greater than 10%."
+  ]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-233
-16
-744
-128
--1
--1
-1.0
+230
+10
+693
+494
+75
+75
+3.0
 1
 10
 1
 1
 1
 0
-0
-0
 1
-0
-500
-0
-80
+1
+1
+-75
+75
+-75
+75
 1
 1
 1
@@ -57,12 +80,12 @@ ticks
 30.0
 
 BUTTON
-7
-46
-96
-79
-NIL
-setup\n
+15
+35
+110
+68
+setup
+setup
 NIL
 1
 T
@@ -74,10 +97,10 @@ NIL
 1
 
 BUTTON
-112
-46
-197
-79
+115
+35
+210
+68
 NIL
 go
 T
@@ -90,139 +113,101 @@ NIL
 NIL
 0
 
-PLOT
-229
-143
-744
-300
-wealth distribution
-NIL
-NIL
-0.0
-500.0
-0.0
-40.0
-false
-false
-"" ""
-PENS
-"current" 5.0 1 -10899396 true "" "histogram [wealth] of turtles"
-
 MONITOR
-599
-425
-744
-470
-wealth of bottom 50%
-sum [wealth] of min-n-of 250 turtles [wealth]
-1
+15
+235
+110
+280
+blue patches
+count patches with\n  [ pcolor = blue ]
+0
 1
 11
 
 MONITOR
-608
-365
-728
-410
-wealth of top 10%
-sum [wealth] of max-n-of 50 turtles [wealth]
-1
+115
+235
+210
+280
+green patches
+count patches with\n  [ pcolor = green ]
+0
 1
 11
 
-TEXTBOX
-563
-176
-679
-206
-Total wealth = $50,000
-11
-0.0
+SWITCH
+5
+135
+219
+168
+change-vote-if-tied?
+change-vote-if-tied?
 1
+1
+-1000
 
-PLOT
-229
-332
-563
-482
-wealth by percent
-NIL
-NIL
-0.0
-10.0
-0.0
-10000.0
-true
-true
-"" ""
-PENS
-"top-10%" 1.0 0 -2674135 true "" "plot sum [wealth] of max-n-of 50 turtles [wealth]"
-"bottom-50%" 1.0 0 -13345367 true "" "plot sum [wealth] of min-n-of 250 turtles [wealth]"
+SWITCH
+5
+174
+219
+207
+award-close-calls-to-loser?
+award-close-calls-to-loser?
+1
+1
+-1000
 
 @#$#@#$#@
 ## ACKNOWLEDGEMENT
 
-This model is from Chapter Two of the book "Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo", by Uri Wilensky & William Rand.
+This model is from Chapter Seven of the book "Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo", by Uri Wilensky & William Rand.
 
-Wilensky, U & Rand, W. (2015). Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo. Cambridge, Ma. MIT Press.
+Wilensky, U. & Rand, W. (2015). Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo. Cambridge, Ma. MIT Press.
 
 This model is in the IABM Textbook folder of the NetLogo models library. The model, as well as any updates to the model, can also be found on the textbook website: http://intro-to-abm.com.
 
 ## WHAT IS IT?
 
-This model is a very simple model of economic exchange.  It is a thought experiment of  a world where, in every time step, each person gives one dollar to one other person (at random) if they have any money to give.  If they have no money then they do not give out any money.
+This model is a simple cellular automaton that simulates voting distribution by having each patch take a "vote" of its eight surrounding neighbors, then perhaps change its own vote according to the outcome.
 
-## HOW IT WORKS
-
-The SETUP for the model creates 500 agents, and then gives them each 100 dollars.  At each tick, they give one dollar to another agent if they can.  If they have no money then they do nothing. Each agent also moves to an x-coordinate equal to its wealth.
+The component verification extension adds the CHECK-SETUP procedure which examines whether or not the initial conditions of the model exceed the expected initial conditions.
 
 ## HOW TO USE IT
 
-Press SETUP to setup the model, then press GO to watch the model develop.
+Click the SETUP button to create an approximately equal but random distribution of blue and green patches.  Click GO to run the simulation.
+
+When both switches are off, the central patch changes its color to match the majority vote, but if there is a 4-4 tie, then it does not change.
+
+If the CHANGE-VOTE-IF-TIED? switch is on, then in the case of a tie, the central patch will always change its vote.
+
+If the AWARD-CLOSE-CALLS-TO-LOSER? switch is on, then if the result is 5-3, the central patch votes with the losing side instead of the winning side.
 
 ## THINGS TO NOTICE
 
-Examine the various graphs and see how the model unfolds. Let it run for many ticks. The WEALTH DISTRIBUTION graph will change shape dramatically as time goes on. What happens to the WEALTH BY PERCENT graph over time?
+Does the model ever generate the warning that is written in the CHECK-SETUP routine?
 
 ## THINGS TO TRY
-Try running the model for many thousands of ticks. Does the distribution stabilize? How can you measure stabilization? Keep track of some individual agents. How do they move?
 
+Change the conditions for the CHECK-SETUP routine so it generates the warning message occasionally.
 
 ## EXTENDING THE MODEL
-Change the number of turtles.  Does this affect the results?
-Change the rules so agents can go into debt. Does this affect the results?
-Change the basic transaction rule of the model.  What happens if the turtles exchange more than one dollar? How about if they give a random amount to another agent at each tick? Change the rules so that the richer agents have a better chance of being given money? Or a smaller chance? How does this change the results?
 
-## NETLOGO FEATURES
+Try other voting rules.
 
-This model makes extensive use of the "widget" based graph methods.
+Start with a nonrandom green-and-blue pattern. For example, one could make half of the world blue and half green.
+
+Can you enhance the model to incorporate multiple colors and multiple votes?  One might interpret shades of color to represent the degree of a patch's opinion about an issue: strongly against, against, neutral, etc.  Each patch could have more than two choices and weighted votes: blue patches' vote could count twice, etc.
 
 ## RELATED MODELS
 
-This model is related to the WEALTH DISTRIBUTION model.
+This is a slight variant of the Voting model in the Social Sciences section of the NetLogo models library.
 
-## HOW TO CITE
+Another related model is Ising in the Chemistry and Physics section of the NetLogo models library. Although it's a physics model, the rules are very similar.
 
-This model is part of the textbook, “Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo.”
-
-If you mention this model or the NetLogo software in a publication, we ask that you include the citations below.
-
-For the model itself:
-
-* Wilensky, U. (2011).  NetLogo Simple Economy model.  http://ccl.northwestern.edu/netlogo/models/IABMTextbook/SimpleEconomy.  Center for Connected Learning and Computer-Based Modeling, Northwestern University, Evanston, IL
-
-Please cite the NetLogo software as:
-
-* Wilensky, U. (1999). NetLogo. http://ccl.northwestern.edu/netlogo/. Center for Connected Learning and Computer-Based Modeling, Northwestern University, Evanston, IL.
-
-Please cite the textbook as:
-
-* Wilensky, U. & Rand, W. (2015). Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo. Cambridge, Ma. MIT Press.
 
 ## CREDITS AND REFERENCES
 
-Models of this kind are described in: 
-Dragulescu, A. & V.M. Yakovenko, V.M. (2000).  Statistical Mechanics of Money. European Physics Journal B.
+This model is described in Rudy Rucker's "Artificial Life Lab", published in 1993 by Waite Group Press.
 @#$#@#$#@
 default
 true

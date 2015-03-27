@@ -1,55 +1,81 @@
-turtles-own [wealth]
+breed [sheep a-sheep]
 
+sheep-own [ energy ]  ;; sheep own energy
+
+;; this procedure sets up the model
 to setup
   clear-all
-  create-turtles 500 [
-    set wealth 100
-    set shape "circle"
-    set color green
-    set size 2 
-
-  ;;  visualize the turtles from left to right in ascending order of wealth 
-    setxy wealth random-ycor 
+  ask patches [  ;; color the whole world green
+    set pcolor green
+  ]
+  
+  ;; create the initial sheep and set their initial properties
+  create-sheep number-of-sheep [
+    setxy random-xcor random-ycor
+    set color white
+    set shape "sheep"
+    set energy 100  
   ]
   reset-ticks
 end
 
-
 to go
-  ;; transact and then update your location
-  ask turtles with [wealth > 0] [transact]
-  ;; prevent wealthy turtles from moving too far to the right
-  ask turtles [if wealth <= max-pxcor [set xcor wealth] ]
+  if not any? sheep [stop]
+  ask sheep [
+    wiggle  ;; first turn a little bit
+    move  ;; then step forward
+    check-if-dead ;; checks to see if sheep should die
+  ]
   tick
+  my-update-plots ;; plot the population counts
 end
 
-to transact
-  ;; give a dollar to another turtle
-  set wealth wealth - 1
-  ask one-of other turtles [set wealth wealth + 1]
+;; sheep procedure, if my energy is low, I die
+to check-if-dead
+  if energy < 0 [
+    die
+  ]
+end
+
+;; update the plots in the interface tab
+to my-update-plots
+  plot count sheep
+end
+
+;; sheep procedure, the agent changes its heading
+to wiggle
+  ;; turn right then left, so the average is straight ahead
+  rt random 90
+  lt random 90
+end
+
+;; sheep procedure, the sheep moves which costs it energy
+to move
+  forward 1  
+  set energy energy - movement-cost ;; reduce the energy by the cost of movement
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-233
-16
-744
-128
--1
--1
-1.0
-1
+303
 10
+733
+461
+17
+17
+12.0
+1
+15
 1
 1
 1
 0
-0
-0
 1
-0
-500
-0
-80
+1
+1
+-17
+17
+-17
+17
 1
 1
 1
@@ -57,12 +83,12 @@ ticks
 30.0
 
 BUTTON
-7
-46
-96
-79
-NIL
-setup\n
+35
+95
+105
+128
+setup
+setup
 NIL
 1
 T
@@ -74,11 +100,11 @@ NIL
 1
 
 BUTTON
-112
-46
-197
-79
-NIL
+170
+95
+240
+128
+go
 go
 T
 1
@@ -91,125 +117,99 @@ NIL
 0
 
 PLOT
-229
-143
-744
-300
-wealth distribution
-NIL
-NIL
-0.0
-500.0
-0.0
-40.0
-false
-false
-"" ""
-PENS
-"current" 5.0 1 -10899396 true "" "histogram [wealth] of turtles"
-
-MONITOR
-599
-425
-744
-470
-wealth of bottom 50%
-sum [wealth] of min-n-of 250 turtles [wealth]
-1
-1
-11
-
-MONITOR
-608
-365
-728
-410
-wealth of top 10%
-sum [wealth] of max-n-of 50 turtles [wealth]
-1
-1
-11
-
-TEXTBOX
-563
-176
-679
-206
-Total wealth = $50,000
-11
-0.0
-1
-
-PLOT
-229
-332
-563
-482
-wealth by percent
-NIL
-NIL
+40
+251
+240
+401
+Population over Time
+Time
+Population
 0.0
 10.0
 0.0
-10000.0
+10.0
 true
-true
+false
 "" ""
 PENS
-"top-10%" 1.0 0 -2674135 true "" "plot sum [wealth] of max-n-of 50 turtles [wealth]"
-"bottom-50%" 1.0 0 -13345367 true "" "plot sum [wealth] of min-n-of 250 turtles [wealth]"
+"default" 1.0 0 -16777216 true "" ""
+
+SLIDER
+34
+8
+239
+41
+number-of-sheep
+number-of-sheep
+0
+1000
+100
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+34
+140
+239
+173
+movement-cost
+movement-cost
+0
+2.0
+1
+.1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## ACKNOWLEDGEMENT
 
-This model is from Chapter Two of the book "Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo", by Uri Wilensky & William Rand.
+This model is from Chapter Four of the book "Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo", by Uri Wilensky & William Rand.
 
-Wilensky, U & Rand, W. (2015). Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo. Cambridge, Ma. MIT Press.
+Wilensky, U. & Rand, W. (2015). Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo. Cambridge, Ma. MIT Press.
 
 This model is in the IABM Textbook folder of the NetLogo models library. The model, as well as any updates to the model, can also be found on the textbook website: http://intro-to-abm.com.
 
 ## WHAT IS IT?
 
-This model is a very simple model of economic exchange.  It is a thought experiment of  a world where, in every time step, each person gives one dollar to one other person (at random) if they have any money to give.  If they have no money then they do not give out any money.
+This is the second model in a set of five models that build toward a predator prey model of population dynamics.  This second model gives the sheep energy, and has them decrement their energy as they move around.   It also plots the number of sheep over time.
+
+It extends the model Wolf Sheep Simple 1.
 
 ## HOW IT WORKS
 
-The SETUP for the model creates 500 agents, and then gives them each 100 dollars.  At each tick, they give one dollar to another agent if they can.  If they have no money then they do nothing. Each agent also moves to an x-coordinate equal to its wealth.
-
+The model creates a population of sheep that wander around the landscape.  Moving around costs some energy, and when their energy gets too low, sheep die.  
 ## HOW TO USE IT
 
-Press SETUP to setup the model, then press GO to watch the model develop.
+Set the NUMBER-OF-SHEEP slider and press SETUP to create the initial population.  You can also change the MOVEMENT-COST slider to affect the energy cost of movement for the sheep.  After this, press the GO button to make the sheep move around the landscape.
 
 ## THINGS TO NOTICE
 
-Examine the various graphs and see how the model unfolds. Let it run for many ticks. The WEALTH DISTRIBUTION graph will change shape dramatically as time goes on. What happens to the WEALTH BY PERCENT graph over time?
+Is the behavior of the model the same every run?
 
 ## THINGS TO TRY
-Try running the model for many thousands of ticks. Does the distribution stabilize? How can you measure stabilization? Keep track of some individual agents. How do they move?
 
+How does the MOVEMENT-COST slider affect the behavior of the model?
 
-## EXTENDING THE MODEL
-Change the number of turtles.  Does this affect the results?
-Change the rules so agents can go into debt. Does this affect the results?
-Change the basic transaction rule of the model.  What happens if the turtles exchange more than one dollar? How about if they give a random amount to another agent at each tick? Change the rules so that the richer agents have a better chance of being given money? Or a smaller chance? How does this change the results?
-
-## NETLOGO FEATURES
-
-This model makes extensive use of the "widget" based graph methods.
+Does the NUMBER-OF-SHEEP slider affect the behavior of the model?
 
 ## RELATED MODELS
 
-This model is related to the WEALTH DISTRIBUTION model.
+The Wolf Sheep Predation Model in the Biology section of the NetLogo models library.
 
 ## HOW TO CITE
 
-This model is part of the textbook, “Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo.”
-
-If you mention this model or the NetLogo software in a publication, we ask that you include the citations below.
+This model is part of the textbook, "Introduction to Agent-Based Modeling: Modeling 
+ Natural, Social and Engineered Complex Systems with NetLogo."
+ 
+If you mention this model or the NetLogo software in a publication, we ask that you include the cites.
 
 For the model itself:
 
-* Wilensky, U. (2011).  NetLogo Simple Economy model.  http://ccl.northwestern.edu/netlogo/models/IABMTextbook/SimpleEconomy.  Center for Connected Learning and Computer-Based Modeling, Northwestern University, Evanston, IL
+* Wilensky, U. (2007).  NetLogo Wolf Sheep Simple 2 model.  http://ccl.northwestern.edu/netlogo/models/IABMTextbook/wolfSheepSimple2.  Center for Connected Learning and Computer-Based Modeling, Northwestern University, Evanston, IL.
 
 Please cite the NetLogo software as:
 
@@ -217,12 +217,10 @@ Please cite the NetLogo software as:
 
 Please cite the textbook as:
 
-* Wilensky, U. & Rand, W. (2015). Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo. Cambridge, Ma. MIT Press.
+* Wilensky, U.  & Rand, W. (2015). Introduction to Agent-Based Modeling: Modeling 
+ Natural, Social and Engineered Complex Systems with NetLogo. Cambridge, Ma. MIT Press.
 
 ## CREDITS AND REFERENCES
-
-Models of this kind are described in: 
-Dragulescu, A. & V.M. Yakovenko, V.M. (2000).  Statistical Mechanics of Money. European Physics Journal B.
 @#$#@#$#@
 default
 true
@@ -390,6 +388,42 @@ true
 0
 Line -7500403 true 150 0 150 150
 
+link
+true
+0
+Line -7500403 true 150 0 150 300
+
+link direction
+true
+0
+Line -7500403 true 150 150 30 225
+Line -7500403 true 150 150 270 225
+
+moose
+false
+0
+Polygon -7500403 true true 196 228 198 297 180 297 178 244 166 213 136 213 106 213 79 227 73 259 50 257 49 229 38 197 26 168 26 137 46 120 101 122 147 102 181 111 217 121 256 136 294 151 286 169 256 169 241 198 211 188
+Polygon -7500403 true true 74 258 87 299 63 297 49 256
+Polygon -7500403 true true 25 135 15 186 10 200 23 217 25 188 35 141
+Polygon -7500403 true true 270 150 253 100 231 94 213 100 208 135
+Polygon -7500403 true true 225 120 204 66 207 29 185 56 178 27 171 59 150 45 165 90
+Polygon -7500403 true true 225 120 249 61 241 31 265 56 272 27 280 59 300 45 285 90
+
+moose-face
+false
+0
+Circle -7500403 true true 101 110 95
+Circle -7500403 true true 111 170 77
+Polygon -7566196 true false 135 243 140 267 144 253 150 272 156 250 158 258 161 241
+Circle -16777216 true false 127 222 9
+Circle -16777216 true false 157 222 8
+Circle -1 true false 118 143 16
+Circle -1 true false 159 143 16
+Polygon -7500403 true true 106 135 88 135 71 111 79 95 86 110 111 121
+Polygon -7500403 true true 205 134 190 135 185 122 209 115 212 99 218 118
+Polygon -7500403 true true 118 118 95 98 69 84 23 76 8 35 27 19 27 40 38 47 48 16 55 23 58 41 71 35 75 15 90 19 86 38 100 49 111 76 117 99
+Polygon -7500403 true true 167 112 190 96 221 84 263 74 276 30 258 13 258 35 244 38 240 11 230 11 226 35 212 39 200 15 192 18 195 43 169 64 165 92
+
 pentagon
 false
 0
@@ -415,6 +449,22 @@ Polygon -7500403 true true 165 180 165 210 225 180 255 120 210 135
 Polygon -7500403 true true 135 105 90 60 45 45 75 105 135 135
 Polygon -7500403 true true 165 105 165 135 225 105 255 45 210 60
 Polygon -7500403 true true 135 90 120 45 150 15 180 45 165 90
+
+sheep
+false
+15
+Circle -1 true true 203 65 88
+Circle -1 true true 70 65 162
+Circle -1 true true 150 105 120
+Polygon -7500403 true false 218 120 240 165 255 165 278 120
+Circle -7500403 true false 214 72 67
+Rectangle -1 true true 164 223 179 298
+Polygon -1 true true 45 285 30 285 30 240 15 195 45 210
+Circle -1 true true 3 83 150
+Rectangle -1 true true 65 221 80 296
+Polygon -1 true true 195 285 210 285 210 240 240 210 195 210
+Polygon -7500403 true false 276 85 285 105 302 99 294 83
+Polygon -7500403 true false 219 85 210 105 193 99 201 83
 
 square
 false
@@ -525,5 +575,5 @@ Line -7500403 true 150 150 90 180
 Line -7500403 true 150 150 210 180
 
 @#$#@#$#@
-0
+1
 @#$#@#$#@

@@ -1,42 +1,140 @@
-turtles-own [wealth]
+patches-own [
+  pheromone             ;; amount of pheromone on this patch
+  food                 ;; amount of food on this patch (0, 1, or 2)
+  nest?                ;; true on nest patches, false elsewhere
+]
+
+turtles-own [
+  carrying-food?
+]
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Setup procedures ;;;
+;;;;;;;;;;;;;;;;;;;;;;;;
 
 to setup
   clear-all
-  create-turtles 500 [
-    set wealth 100
-    set shape "circle"
-    set color green
-    set size 2 
-
-  ;;  visualize the turtles from left to right in ascending order of wealth 
-    setxy wealth random-ycor 
-  ]
+  set-default-shape turtles "bug"
+  create-turtles population
+  [ set size 2         ;; easier to see
+    set carrying-food? false ]
+  setup-patches
   reset-ticks
 end
 
+to setup-patches
+  ask patches
+  [ setup-nest
+    setup-food
+    recolor-patch ]
+end
 
-to go
-  ;; transact and then update your location
-  ask turtles with [wealth > 0] [transact]
-  ;; prevent wealthy turtles from moving too far to the right
-  ask turtles [if wealth <= max-pxcor [set xcor wealth] ]
+to setup-nest  ;; patch procedure
+  ;; set nest? variable to true inside the nest, false elsewhere
+  set nest? (distancexy 0 0) < 5
+end
+
+to setup-food  ;; patch procedure
+  ;; setup food source one on the right
+  if (distancexy (0.6 * max-pxcor) 0) < 5
+  [ set food 2 ]
+  ;; setup food source two on the lower-left
+  if (distancexy (-0.6 * max-pxcor) (-0.6 * max-pycor)) < 5
+  [ set food 2 ]
+  ;; setup food source three on the upper-left
+  if (distancexy (-0.8 * max-pxcor) (0.8 * max-pycor)) < 5
+  [ set food 2 ]
+end
+
+to recolor-patch  ;; patch procedure
+  ;; scale color to show pheromone concentration
+  set pcolor scale-color green pheromone 0.1 5
+  ;; give color to nest and food sources
+  if nest? [ set pcolor violet ]
+  if food > 0 [ set pcolor cyan ]
+end
+
+;;;;;;;;;;;;;;;;;;;;;
+;;; Go procedures ;;;
+;;;;;;;;;;;;;;;;;;;;;
+
+to go  ;; forever button
+  ask turtles [ move recolor ]
+  diffuse pheromone (diffusion-rate / 100)
+  ask patches
+  [ set pheromone pheromone * (100 - evaporation-rate) / 100  ;; slowly evaporate pheromone
+    if pheromone < 0.05 [ set pheromone 0 ]
+    recolor-patch ]
   tick
 end
 
-to transact
-  ;; give a dollar to another turtle
-  set wealth wealth - 1
-  ask one-of other turtles [set wealth wealth + 1]
+to move  ;; turtle procedure
+  if not carrying-food?  [ look-for-food  ]     ;; if not carrying food, look for it
+  if carrying-food? [ move-towards-nest ]   ;; if carrying food head back to the nest
+  wander          ;; turn a small random amount and move forward
+end
+
+
+to move-towards-nest  ;; turtle procedure
+  ifelse nest?
+  [ ;; drop food and head out again
+    set carrying-food? false
+    rt 180 ]
+  [ set pheromone pheromone + 60  ;; drop some pheromone
+    ;; turn towards the nest, which is at the center
+    facexy 0 0 ]
+end
+
+to look-for-food  ;; turtle procedure
+  ifelse  food > 0
+  [ set carrying-food? true  ;; pick up food
+    set food food - 1        ;; and reduce the food source
+    rt 180                   ;; and turn around
+    stop ]
+  [ ;; go in the direction where the pheromone smell is strongest
+    uphill-pheromone ]
+end
+
+;; sniff left and right, and go where the strongest smell is
+to uphill-pheromone  ;; turtle procedure
+  ;; only turn if the current patch doesn't have much pheromone
+  if pheromone < 2 [
+    let scent-ahead pheromone-scent-at-angle   0
+    let scent-right pheromone-scent-at-angle  45
+    let scent-left  pheromone-scent-at-angle -45
+    if (scent-right > scent-ahead) or (scent-left > scent-ahead)
+    [ ifelse scent-right > scent-left
+      [ rt 45 ]
+      [ lt 45 ] ]
+  ]
+end
+
+to wander  ;; turtle procedure
+  rt random 40
+  lt random 40
+  if not can-move? 1 [ rt 180 ]
+  fd 1
+end
+
+to recolor  ;; turtle procedure
+  set color red
+  if carrying-food? [ set color orange + 1]
+end
+
+to-report pheromone-scent-at-angle [angle]
+  let p patch-right-and-ahead angle 1
+  if p = nobody [ report 0 ]
+  report [pheromone] of p
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-233
-16
-744
-128
--1
--1
-1.0
+257
+10
+764
+538
+35
+35
+7.0
 1
 10
 1
@@ -46,10 +144,10 @@ GRAPHICS-WINDOW
 0
 0
 1
-0
-500
-0
-80
+-35
+35
+-35
+35
 1
 1
 1
@@ -57,12 +155,12 @@ ticks
 30.0
 
 BUTTON
-7
 46
-96
-79
+71
+126
+104
 NIL
-setup\n
+setup
 NIL
 1
 T
@@ -73,11 +171,41 @@ NIL
 NIL
 1
 
+SLIDER
+31
+106
+221
+139
+diffusion-rate
+diffusion-rate
+0.0
+99.0
+50
+1.0
+1
+NIL
+HORIZONTAL
+
+SLIDER
+31
+141
+221
+174
+evaporation-rate
+evaporation-rate
+0.0
+99.0
+10
+1.0
+1
+NIL
+HORIZONTAL
+
 BUTTON
-112
-46
-197
-79
+136
+71
+211
+104
 NIL
 go
 T
@@ -90,79 +218,43 @@ NIL
 NIL
 0
 
-PLOT
-229
-143
-744
-300
-wealth distribution
+SLIDER
+31
+36
+221
+69
+population
+population
+0.0
+200.0
+125
+1.0
+1
 NIL
-NIL
-0.0
-500.0
-0.0
-40.0
-false
-false
-"" ""
-PENS
-"current" 5.0 1 -10899396 true "" "histogram [wealth] of turtles"
-
-MONITOR
-599
-425
-744
-470
-wealth of bottom 50%
-sum [wealth] of min-n-of 250 turtles [wealth]
-1
-1
-11
-
-MONITOR
-608
-365
-728
-410
-wealth of top 10%
-sum [wealth] of max-n-of 50 turtles [wealth]
-1
-1
-11
-
-TEXTBOX
-563
-176
-679
-206
-Total wealth = $50,000
-11
-0.0
-1
+HORIZONTAL
 
 PLOT
-229
-332
-563
-482
-wealth by percent
-NIL
-NIL
+10
+180
+245
+535
+Remaining Food
+Time
+Food
 0.0
 10.0
 0.0
-10000.0
+10.0
 true
-true
+false
 "" ""
 PENS
-"top-10%" 1.0 0 -2674135 true "" "plot sum [wealth] of max-n-of 50 turtles [wealth]"
-"bottom-50%" 1.0 0 -13345367 true "" "plot sum [wealth] of min-n-of 250 turtles [wealth]"
+"default" 1.0 0 -16777216 true "" "plot sum [ food ] of patches"
 
 @#$#@#$#@
 ## ACKNOWLEDGEMENT
 
-This model is from Chapter Two of the book "Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo", by Uri Wilensky & William Rand.
+This model is from Chapter One of the book "Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo", by Uri Wilensky & William Rand.
 
 Wilensky, U & Rand, W. (2015). Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo. Cambridge, Ma. MIT Press.
 
@@ -170,36 +262,49 @@ This model is in the IABM Textbook folder of the NetLogo models library. The mod
 
 ## WHAT IS IT?
 
-This model is a very simple model of economic exchange.  It is a thought experiment of  a world where, in every time step, each person gives one dollar to one other person (at random) if they have any money to give.  If they have no money then they do not give out any money.
+In this model, a colony of ants forages for food. Though each ant follows a set of simple rules, the colony as a whole acts in a sophisticated way.
 
 ## HOW IT WORKS
 
-The SETUP for the model creates 500 agents, and then gives them each 100 dollars.  At each tick, they give one dollar to another agent if they can.  If they have no money then they do nothing. Each agent also moves to an x-coordinate equal to its wealth.
+When an ant finds a piece of food, it carries the food back to the nest, dropping a chemical as it moves. When other ants "sniff" the chemical, they follow the chemical toward the food. As more ants carry food to the nest, they reinforce the chemical trail.
 
 ## HOW TO USE IT
 
-Press SETUP to setup the model, then press GO to watch the model develop.
+Click the SETUP button to set up the ant nest (in violet, at center) and three piles of food. Click the GO button to start the simulation. The chemical is shown in a green-to-white gradient.
+
+The EVAPORATION-RATE slider controls the evaporation rate of the chemical. The DIFFUSION-RATE slider controls the diffusion rate of the chemical.
+
+If you want to change the number of ants, move the POPULATION slider before pressing SETUP.
 
 ## THINGS TO NOTICE
 
-Examine the various graphs and see how the model unfolds. Let it run for many ticks. The WEALTH DISTRIBUTION graph will change shape dramatically as time goes on. What happens to the WEALTH BY PERCENT graph over time?
+The ant colony generally exploits the food source in order, starting with the food closest to the nest, and finishing with the food most distant from the nest. It is more difficult for the ants to form a stable trail to the more distant food, since the chemical trail has more time to evaporate and diffuse before being reinforced.
 
-## THINGS TO TRY
-Try running the model for many thousands of ticks. Does the distribution stabilize? How can you measure stabilization? Keep track of some individual agents. How do they move?
+Once the colony finishes collecting the closest food, the chemical trail to that food naturally disappears, freeing up ants to help collect the other food sources. The more distant food sources require a larger "critical number" of ants to form a stable trail.
 
+The consumption of the food is shown in a plot.  The line-colors in the plot match the colors of the food piles.
 
 ## EXTENDING THE MODEL
-Change the number of turtles.  Does this affect the results?
-Change the rules so agents can go into debt. Does this affect the results?
-Change the basic transaction rule of the model.  What happens if the turtles exchange more than one dollar? How about if they give a random amount to another agent at each tick? Change the rules so that the richer agents have a better chance of being given money? Or a smaller chance? How does this change the results?
+
+Try different placements for the food sources. What happens if two food sources are equidistant from the nest? When that happens in the real world, ant colonies typically exploit one source then the other (not at the same time).
+
+In this project, the ants use a "trick" to find their way back to the nest: they follow the "nest scent." Real ants use a variety of different approaches to find their way back to the nest. Try to implement some alternative strategies.
+
+The ants only respond to chemical levels between 0.05 and 2.  The lower limit is used so the ants aren't infinitely sensitive.  Try removing the upper limit.  What happens?  Why?
+
+In the `uphill-chemical` procedure, the ant "follows the gradient" of the chemical. That is, it "sniffs" in three directions, then turns in the direction where the chemical is strongest. You might want to try variants of the `uphill-chemical` procedure, changing the number and placement of "ant sniffs."
+
 
 ## NETLOGO FEATURES
 
-This model makes extensive use of the "widget" based graph methods.
+The built-in `diffuse` primitive lets us diffuse the chemical easily without complicated code.
+
+The primitive `patch-right-and-ahead` is used to make the ants smell in different directions without actually turning.
+
 
 ## RELATED MODELS
+This model is a slight modification of the Ants models in the Biology section of the NetLogo models library.
 
-This model is related to the WEALTH DISTRIBUTION model.
 
 ## HOW TO CITE
 
@@ -209,7 +314,7 @@ If you mention this model or the NetLogo software in a publication, we ask that 
 
 For the model itself:
 
-* Wilensky, U. (2011).  NetLogo Simple Economy model.  http://ccl.northwestern.edu/netlogo/models/IABMTextbook/SimpleEconomy.  Center for Connected Learning and Computer-Based Modeling, Northwestern University, Evanston, IL
+* Wilensky, U. (1997).  NetLogo Ants Simple model.  http://ccl.northwestern.edu/netlogo/models/IABMTextbook/AntsSimple.  Center for Connected Learning and Computer-Based Modeling, Northwestern Institute on Complex Systems, Northwestern University, Evanston, IL.
 
 Please cite the NetLogo software as:
 
@@ -217,12 +322,9 @@ Please cite the NetLogo software as:
 
 Please cite the textbook as:
 
-* Wilensky, U. & Rand, W. (2015). Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo. Cambridge, Ma. MIT Press.
+* Wilensky, U & Rand, W. (2015). Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo. Cambridge, Ma. MIT Press.
 
 ## CREDITS AND REFERENCES
-
-Models of this kind are described in: 
-Dragulescu, A. & V.M. Yakovenko, V.M. (2000).  Statistical Mechanics of Money. European Physics Journal B.
 @#$#@#$#@
 default
 true
@@ -525,5 +627,5 @@ Line -7500403 true 150 150 90 180
 Line -7500403 true 150 150 210 180
 
 @#$#@#$#@
-0
+1
 @#$#@#$#@

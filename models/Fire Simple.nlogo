@@ -1,42 +1,45 @@
-turtles-own [wealth]
+globals [
+  initial-trees   ;; how many trees (green patches) we started with
+]
 
 to setup
   clear-all
-  create-turtles 500 [
-    set wealth 100
-    set shape "circle"
-    set color green
-    set size 2 
-
-  ;;  visualize the turtles from left to right in ascending order of wealth 
-    setxy wealth random-ycor 
+  ;; make some green trees
+  ask patches [
+    if (random 100) < density 
+    [ set pcolor green ] 
+    ;; make a column of burning trees at the left-edge
+    if pxcor = min-pxcor 
+    [ set pcolor red ] 
   ]
+  ;; keep track of how many trees there are
+  set initial-trees count patches with [pcolor = green]
   reset-ticks
 end
 
-
 to go
-  ;; transact and then update your location
-  ask turtles with [wealth > 0] [transact]
-  ;; prevent wealthy turtles from moving too far to the right
-  ask turtles [if wealth <= max-pxcor [set xcor wealth] ]
-  tick
-end
+  ;; stop the model when done
+  if all? patches [pcolor != red]
+      [ stop ]
 
-to transact
-  ;; give a dollar to another turtle
-  set wealth wealth - 1
-  ask one-of other turtles [set wealth wealth + 1]
+  ;; ask the burning trees to set fire to any neighboring non-burning trees
+  ask patches with [pcolor = red] [  ;; ask the burning trees
+    ask neighbors4 with [pcolor = green] [  ;; ask their non-burning neighbor trees
+      set pcolor red ;; to catch on fire
+    ]     
+    set pcolor red - 3.5    ;; once the tree is burned, darken its color
+  ]
+  tick   ;; advance the clock by one “tick”
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-233
-16
-744
-128
--1
--1
-1.0
+200
+10
+712
+543
+125
+125
+2.0
 1
 10
 1
@@ -46,39 +49,48 @@ GRAPHICS-WINDOW
 0
 0
 1
-0
-500
-0
-80
+-125
+125
+-125
+125
 1
 1
 1
 ticks
 30.0
 
-BUTTON
-7
-46
-96
-79
-NIL
-setup\n
-NIL
+MONITOR
+43
+131
+158
+176
+percent burned
+(count patches with [shade-of? pcolor red]) / initial-trees   * 100\n
 1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
 1
+11
+
+SLIDER
+5
+38
+190
+71
+density
+density
+0.0
+99.0
+57
+1.0
+1
+%
+HORIZONTAL
 
 BUTTON
-112
-46
-197
+106
 79
-NIL
+175
+115
+go
 go
 T
 1
@@ -90,126 +102,98 @@ NIL
 NIL
 0
 
-PLOT
-229
-143
-744
-300
-wealth distribution
+BUTTON
+26
+79
+96
+115
+setup
+setup
+NIL
+1
+T
+OBSERVER
 NIL
 NIL
-0.0
-500.0
-0.0
-40.0
-false
-false
-"" ""
-PENS
-"current" 5.0 1 -10899396 true "" "histogram [wealth] of turtles"
-
-MONITOR
-599
-425
-744
-470
-wealth of bottom 50%
-sum [wealth] of min-n-of 250 turtles [wealth]
-1
-1
-11
-
-MONITOR
-608
-365
-728
-410
-wealth of top 10%
-sum [wealth] of max-n-of 50 turtles [wealth]
-1
-1
-11
-
-TEXTBOX
-563
-176
-679
-206
-Total wealth = $50,000
-11
-0.0
-1
-
-PLOT
-229
-332
-563
-482
-wealth by percent
 NIL
 NIL
-0.0
-10.0
-0.0
-10000.0
-true
-true
-"" ""
-PENS
-"top-10%" 1.0 0 -2674135 true "" "plot sum [wealth] of max-n-of 50 turtles [wealth]"
-"bottom-50%" 1.0 0 -13345367 true "" "plot sum [wealth] of min-n-of 250 turtles [wealth]"
+1
 
 @#$#@#$#@
 ## ACKNOWLEDGEMENT
 
-This model is from Chapter Two of the book "Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo", by Uri Wilensky & William Rand.
+This model is from Chapter Three of the book "Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo", by Uri Wilensky & William Rand.
 
-Wilensky, U & Rand, W. (2015). Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo. Cambridge, Ma. MIT Press.
+Wilensky, U. & Rand, W. (2015). Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo. Cambridge, Ma. MIT Press.
 
 This model is in the IABM Textbook folder of the NetLogo models library. The model, as well as any updates to the model, can also be found on the textbook website: http://intro-to-abm.com.
 
 ## WHAT IS IT?
 
-This model is a very simple model of economic exchange.  It is a thought experiment of  a world where, in every time step, each person gives one dollar to one other person (at random) if they have any money to give.  If they have no money then they do not give out any money.
+This model simulates the spread of a fire through a forest.  It shows that the fire's chance of reaching the right edge of the forest depends critically on the density of trees. This is an example of a common feature of complex systems, the presence of a non-linear threshold or critical parameter.
+
+This is a simplified version of the  Fire model in the Earth Science section of the NetLogo Models library.
 
 ## HOW IT WORKS
 
-The SETUP for the model creates 500 agents, and then gives them each 100 dollars.  At each tick, they give one dollar to another agent if they can.  If they have no money then they do nothing. Each agent also moves to an x-coordinate equal to its wealth.
+The fire starts on the left edge of the forest, and spreads to neighboring trees. The fire spreads in four directions: north, east, south, and west.
+
+The model assumes there is no wind.  So, the fire must have trees along its path in order to advance.  That is, the fire cannot skip over an unwooded area (patch), so such a patch blocks the fire's motion in that direction.
 
 ## HOW TO USE IT
 
-Press SETUP to setup the model, then press GO to watch the model develop.
+Click the SETUP button to set up the trees (green) and fire (red on the left-hand side).
+
+Click the GO button to start the simulation.
+
+The DENSITY slider controls the density of trees in the forest. (Note: Changes in the DENSITY slider do not take effect until the next SETUP.)
 
 ## THINGS TO NOTICE
 
-Examine the various graphs and see how the model unfolds. Let it run for many ticks. The WEALTH DISTRIBUTION graph will change shape dramatically as time goes on. What happens to the WEALTH BY PERCENT graph over time?
+When you run the model, how much of the forest burns. If you run it again with the same settings, do the same trees burn? How similar is the burn from run to run?
+
+Each turtle that represents a piece of the fire is born and then dies without ever moving.  If the fire is made of turtles but no turtles are moving, what does it mean to say that the fire moves?  This is an example of different levels in a system: at the level of the individual turtles, there is no motion, but at the level of the turtles collectively over time, the fire moves.
 
 ## THINGS TO TRY
-Try running the model for many thousands of ticks. Does the distribution stabilize? How can you measure stabilization? Keep track of some individual agents. How do they move?
 
+Set the density of trees to 55%. At this setting, there is virtually no chance that the fire will reach the right edge of the forest. Set the density of trees to 70%. At this setting, it is almost certain that the fire will reach the right edge. There is a sharp transition around 59% density. At 59% density, the fire has a 50/50 chance of reaching the right edge.
+
+Try setting up and running a BehaviorSpace experiment (see Tools menu) to analyze the percent burned at different tree density levels.
 
 ## EXTENDING THE MODEL
-Change the number of turtles.  Does this affect the results?
-Change the rules so agents can go into debt. Does this affect the results?
-Change the basic transaction rule of the model.  What happens if the turtles exchange more than one dollar? How about if they give a random amount to another agent at each tick? Change the rules so that the richer agents have a better chance of being given money? Or a smaller chance? How does this change the results?
+
+What if the fire could spread in eight directions (including diagonals)? To do that, use `neighbors` instead of `neighbors4`. How would that change the fire's chances of reaching the right edge? In this model, what "critical density" of trees is needed for the fire to propagate?
+
+Add wind to the model so that the fire can "jump" greater distances in certain directions.
 
 ## NETLOGO FEATURES
 
-This model makes extensive use of the "widget" based graph methods.
+Unburned trees are represented by green patches; burning trees are represented by turtles.  Two breeds of turtles are used, "fires" and "embers".  When a tree catches fire, a new fire turtle is created; a fire turns into an ember on the next turn.  Notice how the program gradually darkens the color of embers to achieve the visual effect of burning out.
+
+The `neighbors4` primitive is used to spread the fire.
+
+You could also write the model without turtles by just having the patches spread the fire, and doing it that way makes the code a little simpler.   Written that way, the model would run much slower, since all of the patches would always be active.  By using turtles, it's much easier to restrict the model's activity to just the area around the leading edge of the fire.
+
+See the "CA 1D Rule 30" and "CA 1D Rule 30 Turtle" for an example of a model written both with and without turtles.
 
 ## RELATED MODELS
 
-This model is related to the WEALTH DISTRIBUTION model.
+Fire, Percolation, Rumor Mill
 
 ## HOW TO CITE
 
-This model is part of the textbook, “Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo.”
-
-If you mention this model or the NetLogo software in a publication, we ask that you include the citations below.
+This model is part of the textbook, "Introduction to Agent-Based Modeling: Modeling 
+ Natural, Social and Engineered Complex Systems with NetLogo."
+ 
+If you mention this model or the NetLogo software in a publication, we ask that you include the cites.
 
 For the model itself:
 
-* Wilensky, U. (2011).  NetLogo Simple Economy model.  http://ccl.northwestern.edu/netlogo/models/IABMTextbook/SimpleEconomy.  Center for Connected Learning and Computer-Based Modeling, Northwestern University, Evanston, IL
+* Wilensky, U. (2006).  NetLogo Fire Simple model.  http://ccl.northwestern.edu/netlogo/models/IABMTextbook/FireSimple.  Center for Connected Learning and Computer-Based Modeling, Northwestern University, Evanston, IL.
+
+This model is a simplified version of:
+
+Wilensky, U. (1997). NetLogo Fire model. http://ccl.northwestern.edu/netlogo/models/Fire. Center for Connected Learning and Computer-Based Modeling, Northwestern University, Evanston, IL.
 
 Please cite the NetLogo software as:
 
@@ -217,12 +201,14 @@ Please cite the NetLogo software as:
 
 Please cite the textbook as:
 
-* Wilensky, U. & Rand, W. (2015). Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo. Cambridge, Ma. MIT Press.
+Wilensky, U  & Rand, W. (2015). Introduction to Agent-Based Modeling: Modeling 
+ Natural, Social and Engineered Complex Systems with NetLogo. Cambridge, Ma. MIT Press.
 
 ## CREDITS AND REFERENCES
 
-Models of this kind are described in: 
-Dragulescu, A. & V.M. Yakovenko, V.M. (2000).  Statistical Mechanics of Money. European Physics Journal B.
+This model is a simplified version of:
+
+Wilensky, U. (1997). NetLogo Fire model. http://ccl.northwestern.edu/netlogo/models/Fire. Center for Connected Learning and Computer-Based Modeling, Northwestern University, Evanston, IL.
 @#$#@#$#@
 default
 true
@@ -509,6 +495,9 @@ Polygon -7500403 true true 30 75 75 30 270 225 225 270
 @#$#@#$#@
 NetLogo 5.2.0-RC4
 @#$#@#$#@
+set density 60.0
+setup
+repeat 180 [ go ]
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@

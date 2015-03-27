@@ -1,68 +1,205 @@
-turtles-own [wealth]
+globals [
+  percent-similar  ;; on the average, what percent of a turtle's neighbors
+                   ;; are the same color as that turtle?
+  percent-unhappy  ;; what percent of the turtles are unhappy?
+]
+
+turtles-own [
+  happy?       ;; for each turtle, indicates whether at least %-similar-wanted percent of
+               ;; that turtles' neighbors are the same color as the turtle
+  similar-nearby   ;; how many neighboring patches have a turtle with my color?
+  total-nearby  ;; sum of previous two variables
+]
+
 
 to setup
   clear-all
-  create-turtles 500 [
-    set wealth 100
-    set shape "circle"
-    set color green
-    set size 2 
-
-  ;;  visualize the turtles from left to right in ascending order of wealth 
-    setxy wealth random-ycor 
+  
+  ;; create a turtle on NUMBER randomly selected patches.
+  ;; note that slider's maximum value is 2500 which is a little less than the total number of patches
+  ask n-of number patches
+    [ sprout 1 ]
+    
+  ask turtles [
+    ;; make approximately half the turtles red and the other half green
+    set color one-of [red green]
   ]
+
+  update-variables
   reset-ticks
 end
 
-
 to go
-  ;; transact and then update your location
-  ask turtles with [wealth > 0] [transact]
-  ;; prevent wealthy turtles from moving too far to the right
-  ask turtles [if wealth <= max-pxcor [set xcor wealth] ]
+  if all? turtles [happy?] [ stop ]
+  move-unhappy-turtles
+  update-variables
   tick
 end
 
-to transact
-  ;; give a dollar to another turtle
-  set wealth wealth - 1
-  ask one-of other turtles [set wealth wealth + 1]
+to move-unhappy-turtles
+  ask turtles with [ not happy? ]
+    [ find-new-spot ]
+end
+
+to find-new-spot
+  rt random-float 360
+  fd random-float 10
+  if any? other turtles-here
+    [ find-new-spot ]          ;; keep going until we find an unoccupied patch
+  setxy pxcor pycor  ;; move to center of patch
+end
+
+to update-variables
+  update-turtles
+  update-globals
+end
+
+to update-turtles
+  ask turtles [
+    ;; in next two lines, we use "neighbors" to test the eight patches
+    ;; surrounding the current patch
+    
+    ;; count the number of my neighbors that are the same color as me
+    set similar-nearby count (turtles-on neighbors)
+      with [color = [color] of myself]
+      
+    ;; count the total number of neighbors
+    set total-nearby count (turtles-on neighbors)
+    
+    ;; I’m happy if there are at least the minimal number of same-colored neighbors
+    set happy? similar-nearby >= ( %-similar-wanted * total-nearby / 100 )
+  ]
+end
+
+to update-globals
+  let similar-neighbors sum [similar-nearby] of turtles
+  let total-neighbors sum [total-nearby] of turtles
+  set percent-similar (similar-neighbors / total-neighbors) * 100
+  set percent-unhappy (count turtles with [not happy?]) / (count turtles) * 100
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-233
-16
-744
-128
--1
--1
-1.0
+273
+10
+640
+398
+25
+25
+7.0
 1
 10
 1
 1
 1
 0
-0
-0
 1
-0
-500
-0
-80
+1
+1
+-25
+25
+-25
+25
 1
 1
 1
 ticks
 30.0
 
-BUTTON
-7
-46
-96
-79
+MONITOR
+470
+410
+583
+455
+Percent Unhappy
+percent-unhappy
+1
+1
+11
+
+MONITOR
+346
+410
+454
+455
+Percent Similar
+percent-similar
+1
+1
+11
+
+PLOT
+10
+140
+259
+283
+Percent Similar
+time
+%
+0.0
+25.0
+0.0
+100.0
+true
+false
+"" ""
+PENS
+"percent" 1.0 0 -2674135 true "" "plot percent-similar"
+
+PLOT
+10
+284
+259
+448
+Percent Unhappy
+time
+%
+0.0
+25.0
+0.0
+100.0
+true
+false
+"" ""
+PENS
+"percent" 1.0 0 -10899396 true "" "plot percent-unhappy"
+
+SLIDER
+15
+55
+240
+88
+number
+number
+500
+2500
+2000
+10
+1
 NIL
-setup\n
+HORIZONTAL
+
+SLIDER
+15
+95
+240
+128
+%-similar-wanted
+%-similar-wanted
+0.0
+100.0
+30
+1.0
+1
+%
+HORIZONTAL
+
+BUTTON
+34
+14
+114
+47
+setup
+setup
 NIL
 1
 T
@@ -74,11 +211,11 @@ NIL
 1
 
 BUTTON
-112
-46
-197
-79
-NIL
+124
+14
+204
+47
+go
 go
 T
 1
@@ -90,126 +227,59 @@ NIL
 NIL
 0
 
-PLOT
-229
-143
-744
-300
-wealth distribution
-NIL
-NIL
-0.0
-500.0
-0.0
-40.0
-false
-false
-"" ""
-PENS
-"current" 5.0 1 -10899396 true "" "histogram [wealth] of turtles"
-
-MONITOR
-599
-425
-744
-470
-wealth of bottom 50%
-sum [wealth] of min-n-of 250 turtles [wealth]
-1
-1
-11
-
-MONITOR
-608
-365
-728
-410
-wealth of top 10%
-sum [wealth] of max-n-of 50 turtles [wealth]
-1
-1
-11
-
-TEXTBOX
-563
-176
-679
-206
-Total wealth = $50,000
-11
-0.0
-1
-
-PLOT
-229
-332
-563
-482
-wealth by percent
-NIL
-NIL
-0.0
-10.0
-0.0
-10000.0
-true
-true
-"" ""
-PENS
-"top-10%" 1.0 0 -2674135 true "" "plot sum [wealth] of max-n-of 50 turtles [wealth]"
-"bottom-50%" 1.0 0 -13345367 true "" "plot sum [wealth] of min-n-of 250 turtles [wealth]"
-
 @#$#@#$#@
 ## ACKNOWLEDGEMENT
 
-This model is from Chapter Two of the book "Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo", by Uri Wilensky & William Rand.
+This model is from Chapter Three of the book "Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo", by Uri Wilensky & William Rand.
 
-Wilensky, U & Rand, W. (2015). Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo. Cambridge, Ma. MIT Press.
+Wilensky, U. & Rand, W. (2015). Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo. Cambridge, Ma. MIT Press.
 
 This model is in the IABM Textbook folder of the NetLogo models library. The model, as well as any updates to the model, can also be found on the textbook website: http://intro-to-abm.com.
 
 ## WHAT IS IT?
 
-This model is a very simple model of economic exchange.  It is a thought experiment of  a world where, in every time step, each person gives one dollar to one other person (at random) if they have any money to give.  If they have no money then they do not give out any money.
+This project models the behavior of two types of turtles in a mythical pond. The red turtles and green turtles get along with one another. But each turtle wants to make sure that it lives near some of "its own." That is, each red turtle wants to live near at least some red turtles, and each green turtle wants to live near at least some green turtles. The simulation shows how these individual preferences ripple through the pond, leading to large-scale patterns.
 
-## HOW IT WORKS
+This project was inspired by Thomas Schelling's writings about social systems (particularly with regards to housing segregation in cities).
 
-The SETUP for the model creates 500 agents, and then gives them each 100 dollars.  At each tick, they give one dollar to another agent if they can.  If they have no money then they do nothing. Each agent also moves to an x-coordinate equal to its wealth.
+This model is a simplified version of the Segregation model that is in the Social Science section of the NetLogo models library.
 
 ## HOW TO USE IT
 
-Press SETUP to setup the model, then press GO to watch the model develop.
+Click the SETUP button to set up the turtles. There are equal numbers of red and green turtles. The turtles move around until there is at most one turtle on a patch.  Click GO to start the simulation. If turtles don't have enough same-color neighbors, they jump to a nearby patch.
+
+The NUMBER slider controls the total number of turtles. (It takes effect the next time you click SETUP.)  The %-SIMILAR-WANTED slider controls the percentage of same-color turtles that each turtle wants among its neighbors. For example, if the slider is set at 30, each green turtle wants at least 30% of its neighbors to be green turtles.
+
+The "PERCENT SIMILAR" monitor shows the average percentage of same-color neighbors for each turtle. It starts at about 0.5, since each turtle starts (on average) with an equal number of red and green turtles as neighbors. The "PERCENT UNHAPPY" monitor shows the percent of turtles that have fewer same-color neighbors than they want (and thus want to move).  Both monitors are also plotted.
 
 ## THINGS TO NOTICE
 
-Examine the various graphs and see how the model unfolds. Let it run for many ticks. The WEALTH DISTRIBUTION graph will change shape dramatically as time goes on. What happens to the WEALTH BY PERCENT graph over time?
+When you execute SETUP, the red and green turtles are randomly distributed throughout the pond. But many turtles are "unhappy" since they don't have enough same-color neighbors. The unhappy turtles jump to new locations in the vicinity. But in the new locations, they might tip the balance of the local population, prompting other turtles to leave. If a few red turtles move into an area, the local green turtles might leave. But when the green turtles move to a new area, they might prompt red turtles to leave that area.
+
+Over time, the number of unhappy turtles decreases. But the pond becomes more segregated, with clusters of red turtles and clusters of green turtles.
+
+In the case where each turtle wants at least 30% same-color neighbors, the turtles end up with (on average) 70% same-color neighbors. So relatively small individual preferences can lead to significant overall segregation.
 
 ## THINGS TO TRY
-Try running the model for many thousands of ticks. Does the distribution stabilize? How can you measure stabilization? Keep track of some individual agents. How do they move?
 
+Try different values for %-SIMILAR-WANTED. How does the overall degree of segregation change?
 
-## EXTENDING THE MODEL
-Change the number of turtles.  Does this affect the results?
-Change the rules so agents can go into debt. Does this affect the results?
-Change the basic transaction rule of the model.  What happens if the turtles exchange more than one dollar? How about if they give a random amount to another agent at each tick? Change the rules so that the richer agents have a better chance of being given money? Or a smaller chance? How does this change the results?
+If each turtle wants at least 40% same-color neighbors, what percentage (on average) do they end up with?
 
 ## NETLOGO FEATURES
 
-This model makes extensive use of the "widget" based graph methods.
-
-## RELATED MODELS
-
-This model is related to the WEALTH DISTRIBUTION model.
+In the UPDATE-GLOBALS procedure, note the use of SUM, COUNT, VALUES-FROM, and WITH to compute the percentages displayed in the monitors and plots.
 
 ## HOW TO CITE
 
-This model is part of the textbook, “Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo.”
-
-If you mention this model or the NetLogo software in a publication, we ask that you include the citations below.
+This model is part of the textbook, "Introduction to Agent-Based Modeling: Modeling 
+ Natural, Social and Engineered Complex Systems using NetLogo."
+ 
+If you mention this model or the NetLogo software in a publication, we ask that you include the cites.
 
 For the model itself:
 
-* Wilensky, U. (2011).  NetLogo Simple Economy model.  http://ccl.northwestern.edu/netlogo/models/IABMTextbook/SimpleEconomy.  Center for Connected Learning and Computer-Based Modeling, Northwestern University, Evanston, IL
+* Wilensky, U. & Rand, W. (2006).  NetLogo Segregation Simple model.  http://ccl.northwestern.edu/netlogo/models/IABM Textbook/SegregationSimple.  Center for Connected Learning and Computer-Based Modeling, Northwestern University, Evanston, IL.
 
 Please cite the NetLogo software as:
 
@@ -217,12 +287,17 @@ Please cite the NetLogo software as:
 
 Please cite the textbook as:
 
-* Wilensky, U. & Rand, W. (2015). Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo. Cambridge, Ma. MIT Press.
+* Wilensky, U  & Rand, W. (2015). Introduction to Agent-Based Modeling: Modeling 
+ Natural, Social and Engineered Complex Systems with NetLogo. Cambridge, Ma. MIT Press.
 
 ## CREDITS AND REFERENCES
 
-Models of this kind are described in: 
-Dragulescu, A. & V.M. Yakovenko, V.M. (2000).  Statistical Mechanics of Money. European Physics Journal B.
+This model is adapted from:
+
+Wilensky, U. (1997). NetLogo Segregation model. http://ccl.northwestern.edu/netlogo/models/Segregation. Center for Connected Learning and Computer-Based Modeling, Northwestern University, Evanston, IL.
+
+Schelling, T. (1978). Micromotives and Macrobehavior. New York: Norton.  
+See also a recent Atlantic article:   Rauch, J. (2002). Seeing Around Corners; The Atlantic Monthly; April 2002;Volume 289, No. 4; 35-48. http://www.theatlantic.com/issues/2002/04/rauch.htm
 @#$#@#$#@
 default
 true
@@ -390,6 +465,17 @@ true
 0
 Line -7500403 true 150 0 150 150
 
+link
+true
+0
+Line -7500403 true 150 0 150 300
+
+link direction
+true
+0
+Line -7500403 true 150 150 30 225
+Line -7500403 true 150 150 270 225
+
 pentagon
 false
 0
@@ -525,5 +611,5 @@ Line -7500403 true 150 150 90 180
 Line -7500403 true 150 150 210 180
 
 @#$#@#$#@
-0
+1
 @#$#@#$#@
