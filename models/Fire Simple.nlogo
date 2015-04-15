@@ -124,7 +124,7 @@ NIL
 
 This model is from Chapter Three of the book "Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo", by Uri Wilensky & William Rand.
 
-Wilensky, U. & Rand, W. (2015). Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo. Cambridge, Ma. MIT Press.
+Wilensky, U. & Rand, W. (2015). Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo. Cambridge, MA. MIT Press.
 
 This model is in the IABM Textbook folder of the NetLogo models library. The model, as well as any updates to the model, can also be found on the textbook website: http://intro-to-abm.com.
 
@@ -202,7 +202,7 @@ Please cite the NetLogo software as:
 Please cite the textbook as:
 
 Wilensky, U  & Rand, W. (2015). Introduction to Agent-Based Modeling: Modeling 
- Natural, Social and Engineered Complex Systems with NetLogo. Cambridge, Ma. MIT Press.
+ Natural, Social and Engineered Complex Systems with NetLogo. Cambridge, MA. MIT Press.
 
 ## CREDITS AND REFERENCES
 
@@ -493,7 +493,7 @@ Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 
 @#$#@#$#@
-NetLogo 5.2.0-RC4
+NetLogo 5.2.0
 @#$#@#$#@
 set density 60.0
 setup
