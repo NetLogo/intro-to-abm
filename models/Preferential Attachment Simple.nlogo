@@ -1,7 +1,11 @@
 to setup
   ca
   set-default-shape turtles "circle"
-  create-turtles 2 [ fd 5 ]                              ;; create two turtles (nodes) and space them out
+  ;; create two turtles (nodes) and space them out
+  create-turtles 2 [
+    set color red
+    fd 5
+  ]
   ask turtle 0 [ create-link-with turtle 1 ]  ;; create a link between them
   reset-ticks
 end
@@ -12,33 +16,54 @@ to go
   ;; this gives a node a chance to be a partner based on how many links it has
   let partner one-of [both-ends] of one-of links ;; this is the heart of the preferential attachment mechanism
   ;; create new node, link to partner
-  create-turtles 1 [ fd 5 create-link-with partner ]
+  create-turtles 1 [
+    set color red
+    ;; move close to my partner, but not too close
+    move-to partner
+    fd 1
+    create-link-with partner
+  ]
   ;; lay out the nodes with a spring layout
-  layout-spring turtles links 0.2 5 1
+  layout
   tick
+end
+
+to layout
+  ;; layout-spring makes all the links act like springs.
+  ;; 0.2 - spring constant; how hard the spring pushes or pulls to get to its ideal length
+  ;; 2   - ideal spring length
+  ;; 0.5 - repulsion; how hard all turtles push against each other to space things out
+  layout-spring turtles links 0.2 2 0.5
+
+  ask turtles [
+    ;; stay away from the edges of the world; the closer I get to the edge, the more I try
+    ;; to get away from it.
+    facexy 0 0
+    fd (distancexy 0 0) / 100
+  ]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
 210
 10
-649
-470
-16
-16
-13.0
+675
+496
+32
+32
+7.0
 1
 10
 1
 1
 1
 0
+0
+0
 1
-1
-1
--16
-16
--16
-16
+-32
+32
+-32
+32
 1
 1
 1
@@ -46,10 +71,10 @@ ticks
 30.0
 
 BUTTON
-16
-58
-82
-91
+5
+10
+71
+43
 NIL
 setup
 NIL
@@ -63,10 +88,10 @@ NIL
 1
 
 BUTTON
-125
-104
-188
-137
+95
+50
+158
+83
 NIL
 go
 T
@@ -80,12 +105,12 @@ NIL
 0
 
 BUTTON
-24
-269
-94
-302
+5
+130
+75
+163
 layout
-layout-spring turtles links 0.2 5 1\ntick
+layout display
 T
 1
 T
@@ -97,10 +122,10 @@ NIL
 0
 
 SLIDER
-4
-162
-176
-195
+5
+90
+177
+123
 num-nodes
 num-nodes
 2
@@ -112,10 +137,10 @@ NIL
 HORIZONTAL
 
 MONITOR
-25
-350
-91
-395
+5
+175
+71
+220
 min-deg
 min [ count link-neighbors] of turtles
 1
@@ -123,10 +148,10 @@ min [ count link-neighbors] of turtles
 11
 
 MONITOR
-110
-351
-180
-396
+75
+175
+145
+220
 max-deg
 max [count link-neighbors] of turtles
 1
@@ -134,10 +159,10 @@ max [count link-neighbors] of turtles
 11
 
 BUTTON
-17
-105
-102
-138
+5
+50
+90
+83
 go-once
 go
 NIL
@@ -150,12 +175,30 @@ NIL
 NIL
 0
 
+PLOT
+5
+230
+205
+380
+Degree Distribution
+Degree
+# Nodes
+0.0
+1.0
+0.0
+1.0
+true
+false
+"" "set-plot-x-range 0 max [ count my-links ] of turtles"
+PENS
+"default" 1.0 0 -16777216 true "" "histogram [ count my-links ] of turtles"
+
 @#$#@#$#@
 ## ACKNOWLEDGEMENT
 
 This model is from Chapter Five of the book "Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo", by Uri Wilensky & William Rand.
 
-Wilensky, U. & Rand, W. (2015). Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo. Cambridge, Ma. MIT Press.
+Wilensky, U. & Rand, W. (2015). Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo. Cambridge, MA. MIT Press.
 
 This model is in the IABM Textbook folder of the NetLogo models library. The model, as well as any updates to the model, can also be found on the textbook website: http://intro-to-abm.com.
 
@@ -195,13 +238,13 @@ Assign an additional attribute to each node.  Make the probability of attachment
 
 ## NETLOGO FEATURES
 
-Nodes are turtle agents and edges are link agents. 
+Nodes are turtle agents and edges are link agents.
 
-The model uses the ONE-OF primitive to chose a random link and the BOTH-ENDS primitive to select the two nodes attached to that link. 
+The model uses the ONE-OF primitive to chose a random link and the BOTH-ENDS primitive to select the two nodes attached to that link.
 
 There are many ways to graphically display networks. This model uses the layout-spring primitive to implement a common method in which the movement of a node at each time step is the net result of "spring" forces that pulls connected nodes together, and repulsion forces that push all the nodes away from each other.
 
-Though it is not used in this model, there exists a network extension for NetLogo (bundled with NetLogo) that has many more network primitives. 
+Though it is not used in this model, there exists a network extension for NetLogo (bundled with NetLogo) that has many more network primitives.
 
 ## RELATED MODELS
 
@@ -225,24 +268,34 @@ Please cite the NetLogo software as:
 
 Please cite the textbook as:
 
-* Wilensky, U. & Rand, W. (2015). Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo. Cambridge, Ma. MIT Press.
+* Wilensky, U. & Rand, W. (2015). Introduction to Agent-Based Modeling: Modeling Natural, Social and Engineered Complex Systems with NetLogo. Cambridge, MA. MIT Press.
 
 ## CREDITS AND REFERENCES
 This model is a simplified version of the PREFERENTIAL ATTACHMENT model from the networks section of the NetLogo models library.
 Wilensky, U. (2005).  NetLogo Preferential Attachment model.  http://ccl.northwestern.edu/netlogo/models/PreferentialAttachment.  Center for Connected Learning and Computer-Based Modeling, Northwestern University, Evanston, IL.
 
-Both the original and this model are based on:  
+Both the original and this model are based on:
 Albert-László Barabási. Linked: The New Science of Networks, Perseus Publishing, Cambridge, Massachusetts, pages 79-92.
 
-For a more technical treatment, see:  
+For a more technical treatment, see:
 Albert-László Barabási & Reka Albert. Emergence of Scaling in Random Networks, Science, Vol 286, Issue 5439, 15 October 1999, pages 509-512.
 
 Barabási's webpage has additional information at: http://www.nd.edu/~alb/
 
 The layout algorithm is based on the Fruchterman-Reingold layout algorithm.  More information about this algorithm can be obtained at: http://citeseer.ist.psu.edu/fruchterman91graph.html.
 
-For a model similar to the one described in the suggested extension, please consult:  
+For a model similar to the one described in the suggested extension, please consult:
 W. Brian Arthur, "Urban Systems and Historical Path-Dependence", Chapt. 4 in Urban systems and Infrastructure, J. Ausubel and R. Herman (eds.), National Academy of Sciences, Washington, D.C., 1988.
+
+## COPYRIGHT AND LICENSE
+
+Copyright 2008 Uri Wilensky.
+
+![CC BY-NC-SA 3.0](http://ccl.northwestern.edu/images/creativecommons/byncsa.png)
+
+This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 3.0 License.  To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-sa/3.0/ or send a letter to Creative Commons, 559 Nathan Abbott Way, Stanford, California 94305, USA.
+
+Commercial licenses are also available. To inquire about commercial licenses, please contact Uri Wilensky at uri@northwestern.edu.
 @#$#@#$#@
 default
 true
@@ -550,7 +603,7 @@ Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 
 @#$#@#$#@
-NetLogo 5.2.0-RC4
+NetLogo 5.2.0
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
@@ -568,5 +621,5 @@ Line -7500403 true 150 150 90 180
 Line -7500403 true 150 150 210 180
 
 @#$#@#$#@
-0
+1
 @#$#@#$#@
