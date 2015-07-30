@@ -97,11 +97,21 @@
 <script>
   window.addEventListener('hashchange', loadContents);
   function loadContents() {
-    var page=window.location.hash.substring(1) + '.html';
+    var page = window.location.hash.substring(1);
+    if (page.indexOf('-') > 0) {
+      var inPageAnchor = page.split('-')[1];
+      page = page.split('-')[0]
+    }
+    page = page + '.html';
     if (page === '.html') {
       page = 'home.html';
     }
-    $('#content').load(page);
+    $('#content').load(page, function() {
+      if (inPageAnchor) {
+        var divPosition = $('#' + inPageAnchor).offset();
+        $('html, body').animate({scrollTop: divPosition.top}, "slow");
+      }
+    });
   }
   loadContents();
 </script>
