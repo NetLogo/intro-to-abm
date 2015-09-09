@@ -320,3 +320,14 @@ nav ul li a:hover {
   padding-left: 22px;
   padding-top: 3px;
 }
+
+
+#updates .li-blue
+{
+  background-image: url("images/turtle-bullet-blue.png");
+  background-position: 0 0.4em;
+  background-repeat: no-repeat;
+  background-size: 15px auto;
+  padding-left: 22px;
+  padding-top: 3px;
+}

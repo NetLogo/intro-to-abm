@@ -1,6 +1,8 @@
 <div id="updates" class="text-only-content">
   <h2> Updates to the Book </h2>
   Since the book was published, a number of revisions and updates to the book's text have been made. The latest version of the text (and updated models when applicable) is listed below.
+  <br/><br/>
+  <div>Updates with a red bullet icon (<img src="images/turtle-bullet.png"  style="position:absolute;margin-left: 1px;margin-top: 3px;" width="16px" style="padding-top:4px"/>&nbsp;&nbsp;&nbsp;&nbsp;) were present in the first edition of the book, but fixed for the second printing of the first edition. Updates with a blue icon (<img src="images/turtle-bullet-blue.png" style="position:absolute;margin-left:-1px;" width="20px"/>&nbsp;&nbsp;&nbsp;&nbsp;) are present in all versions of the book. </div>
 
   <h3>Preface</h3>
 
@@ -51,21 +53,46 @@
       The code for the heroes and cowards model is deliberately not quite correct. In exploration 13, we ask readers to find and fix the bug.  Here is a link to a corrected version of the model: <a href='othermodels/Heroes and Cowards (exploration 13).nlogo' class="model-download-link">Heroes and Cowards (exploration 13)</a>
     </li>
     <li id="p87">
-    Page 87 reads:
-    <blockquote>
-      In fact, several of the models that we have already discussed, such as Ants, the Game of Life and Heroes, and Cowards have been applied to understanding social systems.
-    </blockquote>
-    It should say:
-    <blockquote>
-      In fact, several of the models that we have already discussed, such as Ants, the Game of Life, and Heroes and Cowards have been applied to understanding social systems. 
-    </blockquote>
+      Page 87 reads:
+      <blockquote>
+        In fact, several of the models that we have already discussed, such as Ants, the Game of Life and Heroes, and Cowards have been applied to understanding social systems.
+      </blockquote>
+      It should say:
+      <blockquote>
+        In fact, several of the models that we have already discussed, such as Ants, the Game of Life, and Heroes and Cowards have been applied to understanding social systems. 
+      </blockquote>
+    </li>
+    <li id="p92">
+      On page 92, in Box 2.11, the sentence:
+      <blockquote>
+      Unlike agentsets, lists can have duplicate members, so for example, one could have a list of turtle agents such as [(turtle 0) (turtle 5) (turtle 0) (turtle 3) (turtle 5)].
+      </blockquote>
+      should be added at the end of the paragraph that starts
+      <blockquote>Lists are ordered collections of data...</blockquote>
     </li>
   </ul>
   <h3>Chapter 3</h3>
 
   <ul>
+    <li id="p104">
+      On page 104, the sentence that reads:
+      <blockquote>
+        A fire moving through a forest can be thought of as a kind of percolation where the fire is like the oil and the forest is like the rock, with the empty places in the forest analogous to the porosity of the rock.
+      </blockquote>
+      should read:
+      <blockquote>
+        A fire moving through a forest can be thought of as a kind of percolation where the fire is like the oil, the trees are like the spaces between the rock, and the empty places in the forest cannot percolate the fire, analogous to the rock.
+      </blockquote>
+    </li>
+    <li id="p109">
+      In the last paragraph on page 109, the 2 in the sentence:
+      <blockquote>
+        However, if we raise the density to 61 percent, just 2 percent more density...
+      </blockquote>
+      should be a 4.
+    </li>
     <li id="p110">Page 110 refers to the "IABM" folder of the models library. It should be the "IABM Textbook" folder.</li>
-    <li id="p114">
+    <li id="p114" class="li-blue">
       Page 114 contains the following code: <code>if all? patches [pcolor = red]</code>.
       <br/>
       It should actually be: <code>if all? patches [pcolor != red]</code>.
@@ -78,6 +105,20 @@
       Also, the text of the caption should say:
       <blockquote>
         A map of Chicago with each dot representing twenty-five people. By representing the data at this finer level of resolution, we see nuances of segregation (e.g., smaller segregated neighborhoods are visible that would disappear at a coarser resolution)  much like ABM enables us to explore nuances of individual-level behavior.
+      </blockquote>
+    </li>
+    <li id="p133">
+      The first line on page 133 should read:
+      <blockquote>
+        The code asks a random set of patches to each sprout a turtle.
+      </blockquote>
+    </li>
+    <li id="p134">
+      The first paragraph of page 134 reads:
+      <blockquote>One simple extension to this model is to add a third, fourth, and even fifth ethnicity. This can be done by modifying the SETUP code. Currently the model sets all the turtles to red initially, then asks half of them to become green. Recall the code that sets up the turtles:  
+      </blockquote>
+      It should read:
+      <blockquote>One simple extension to this model is to add a third, fourth, and even fifth ethnicity. This can be done by modifying the SETUP code. Currently the model sets all the turtles to random colors initially, then asks each of them to randomly choose to be colored red or green. Recall the code that sets up the turtles:
       </blockquote>
     </li>
     <li id="p145">
@@ -105,7 +146,7 @@
     <li id="p149">
       On page 149, Figure 3.26 should be replaced by the following image:
       <br/>
-      <img alt="Figure 3.26" src="images/figure-3.26.png"/>
+      <img alt="Figure 3.26" src="images/figure-3.26.png" height="400"/>
     </li>
 
     <li>
@@ -126,7 +167,11 @@
       Page 153, exploration 12 refers to the extensions of the "Fire model". It should instead refer to the extensions of the "Fire Simple model" found in the models library at IABM Textbook &gt; chapter 3 &gt; Fire Extensions.
     </li>
 
-    <li id="p176">
+    <li id="p173">
+      On page 173, in the middle of the page, there should be a line break between the wiggle procedure and the move procedure.
+    </li>
+
+    <li id="p176" class="li-blue">
       On page 176, the procedure at the end of the page reads:
       <pre>
       to setup
@@ -141,18 +186,44 @@
       end</pre>
     </li>
 
-    <li id="p173">
-    On page 173, in the middle of the page, there should be a line break between the wiggle procedure and the move procedure.
-    </li>
-
     <li>
       The IABM Textbook folder of the NetLogo 5.2 models library contains slightly older versions of the Fire extensions models. The models hosted in the <a href="#models2">Models</a> section of this website are the most up-to-date versions.
     </li>
   </ul>
 
+  <h3>Chapter 4</h3>
+  <ul>
+    <li id="p194">
+      On page 194, the sentence:
+      <blockquote>...which means that there is always a positive probability that the population will rebound.</blockquote>
+      should read:
+      <blockquote>...which means that even when the population dips very low, it will always rebound.</blockquote>
+      
+    </li>
+  </ul>
   <h3>Chapter 5</h3>
 
   <ul>
+    <li id="p204">
+      In the last paragraph on page 204, the text should read:
+      <blockquote>
+        ..causing the traffic jam to move backward even as the traffic moves forward.
+      </blockquote>
+      as opposed to
+      <blockquote>
+        causing the traffic jam to move backward even as the traffic jam moves forward
+    </blockquote>
+    </li>
+    <li id="p208">
+      On page 208, after the sentence:
+      <blockquote>The SPEED-LIMIT and SPEED-MIN are set to constant values, which means that all of the cars in this model will have the same SPEED-LIMIT and SPEED-MIN.</blockquote> we have added:
+      <blockquote>
+       Since they are the same for every car, these variables could have been defined as globals rather than turtle variables. We have specified them as turtle variables since modifications or extensions to this model might well have every car with its own speed-limit values.
+      </blockquote>
+    </li>
+    <li id="p211">
+      In the last paragraph on page 211, when we refer to the grass variable in the text, we mean to refer to the GRASS-AMOUNT variable.
+    </li>
     <li id="p218">On page 218, there is code that says "forward10" (no space between the word and number). It should say "forward 10".</li>
 
     <li>
@@ -173,13 +244,63 @@
       On page 219-222, the book goes through the agentset efficiency model. Since time of publication, we have created an improved version of that model. The improved model is in the IABM Textbook folder of the models library (and also in the NetLogo models tab of this website). <a href="models/Agentset Efficiency.nlogo">The model on this website</a> should be considered definitive, and not the code in the textbook.
     </li>
 
+    <li>
+      On page 219, we have clarified the sentence:
+      <blockquote>This code computes each of the two agentsets PATCHES WITH [PCOLOR = RED]
+        and PATCHES WITH [PCOLOR = GREEN] twice.
+      </blockquote>
+      to read:
+      <blockquote>This code computes each of the two agentsets (patches with [ pcolor = red ] and patches with [ pcolor = green ]) once in the ask and then once for each patch, since the agentsets are constructed in the bodies of the ask blocks. That is, each agentset is computed one plus the number of patches times!</blockquote>
+    </li>
+
+    <li id="p220">
+      On page 220, where we say:
+      <blockquote>
+        Instead, this code will result in a picture like figure 5.5, where all the patches are red.
+      </blockquote>
+      The patches we are refering to are green. Also, in the last paragraph, the line:
+      <blockquote>
+        The first “if statement” turns the patches green. 
+      </blockquote>
+      should read:
+      <blockquote>
+        The first ask statement turns the patches green.
+      </blockquote>
+    </li>
+    <li id="p221">
+      On page 221, the text:
+      <blockquote>
+        ...second “if statement” is executed, all the patches are green and therefore then turn red. By computing the agentsets ahead of time, as in GO-4, you are not only using more efficient code but are also ensuring that the green-patches agentsets you ask to execute the instructions are the same green-patches agentsets as at the start of the procedure and not the set of green patches that result from the first “if-statement,” resulting in the expected picture of figure 5.4.
+      </blockquote>
+      has been updated to:
+      <blockquote>
+        second ask statement is executed, so all the patches are green, and therefore do nothing! By computing the agentsets ahead of time, as in GO-4, we are not only using more efficient code but are also ensuring that the count of patches that were red stays the same throughout the procedure, resulting in the expected picture in figure 5.4.
+      </blockquote>
+    </li>
+    <li id="p222">
+      On page 222, Figures 5.5 should be replaced by the following image:
+      <br/>
+      <img alt="Figure 8.19 A" src="images/figure-5.5.png" height="300"/>
+    </li>
+    <li id="p226">
+      On page 226, where it reads:
+      <blockquote>
+      While this second implementation of the car agent’s cognition is more sophisticated than our initial design, it is still built on an underlying assumption that can be further refined. 
+      </blockquote>
+      It should read:
+      <blockquote>
+      While this second implementation of the car agent’s cognition is not really more sophisticated than our initial design, it is still built on an underlying assumption that can be further refined.
+      </blockquote>
+    </li>
     <li id="p228">
       On page 228, the following text appears: "To implement the goal-based version of the model". It should be expanded as follow:
       <blockquote>
         To implement the goal-based version of the model (the traffic-grid-goal model found in the chapter 5 subfolder of the IABM TEXTBOOK folder of the NetLogo models library),
       </blockquote>
     </li>
-
+    <li id="p231">
+      On page 231, the text in the first paragraph should refer to TICKS-BETWEEN-EXPLORATION, not TICKS-BETWEEN-TESTS
+    </li>
     <li id="p246">
       Page 246 describes the Preferential Attachment Simple model. This model has been updated with an improved visualization. <a href="models/Preferential Attachment Simple.nlogo">The model on this website</a> is up to date.
     </li>
@@ -195,6 +316,33 @@
 
   </ul>
 
+  <h3>Chapter 6</h3>
+  <ul>
+    <li id="p284">
+      On page 284, the text reads:
+      <blockquote>
+          It is impossible for the remaining 125 people to each infect five new people, and thus the number of infected people will tail off because there is no one left to infect.        
+      </blockquote>
+      it should read:
+      <blockquote>
+          It is impossible for all 156 infected people to each infect five new people because there are only 44 uninfected people remaining, and thus the graph of the number of infected people will flatten out because there are few people left to infect.        
+      </blockquote>
+    </li>
+    <li id="p291">
+      The last paragraph on page 291 incorrectly refers to the full data set in table 6.3. It should refer to the data set in table 6.5
+    </li>
+    <li id="p306">
+      On page 306, the last paragraph reads:
+      <blockquote>
+        This could indicate whether that individual practices hygiene habits or participates in infectious behavior.  
+      </blockquote>
+      it should read:
+      <blockquote>
+        This could reflect varying strengths in individuals' immune systems or how well they take care of themselves once they get sick.
+      </blockquote>
+    </li>
+  </ul>
+
   <h3>Chapter 8</h3>
 
   <ul>
@@ -205,7 +353,12 @@
       It should say:
       <blockquote>For instance, in the Disease HubNet model described above</blockquote>
     </li>
-
+    <li id="p361">
+      The caption on Figure 8.2 on page 261 should read:
+      <blockquote>
+        HubNet Disease Activity (Wilensky &amp; Stroup, 1999b). The NetLogo model on the top is the HubNet server, and there are two clients beneath it.
+      </blockquote>
+    </li>
     <li>
       Figure 8.6 of the HubNet model is misleading. This one is clearer:
       <blockquote>
@@ -217,7 +370,36 @@
       On page 375, the textbook is assuming you are using the latest version of the GoGo Board hardware, which uses an HID (Human Interface Device) interface. If you have an older version of the board that uses the serial interface, then load the gogo-serial extension.
     </li>
 
-    <li id="p400">
+    <li id="p375">
+      At the bottom of page 375, the text reads:
+      <blockquote>
+        Open the monitors to see how the GoGo extension allows access to the current readings on the dedicated sensor ports. For instance, the reporter:
+
+        <pre><code>
+        gogo:sensor 8
+        </code></pre>
+        reports the...
+      </blockquote>
+      It should read:
+      <blockquote>
+        Inspect the code for the monitor to see the gogo extension code inside it that allows access to the current readings on the dedicated sensor ports. For instance in the "sensor 8" monitor, there is the code <code>gogo:sensor 8</code>, a reporter that reports the...
+      </blockquote>
+    </li>
+
+    <li id="p395">
+      The text in the last paragraph on page 395 the sentence:
+      <blockquote>In this example, our fitness function could be as simple as the straight-line distance from the turtle to the target patch after twenty ticks. </blockquote>
+      should say the model runs for twenty-five ticks.
+    </li>
+
+    <li id="p399">
+      On page 399, Figures 8.19 A and B should be replaced by the following images:
+      <br/>
+      <img alt="Figure 8.19 A" src="images/figure-8.19-A.png" height="300"/><br/><br/>
+      <img alt="Figure 8.19 B" src="images/figure-8.19-B.png" height="300"/>
+    </li>
+
+    <li id="p400" class="li-blue">
       On page 400, the code for the setup procedure of the Sandpile Simple model is shown as follows:
       <pre>
       to setup [setup-task]
@@ -252,22 +434,33 @@
       </pre>
     </li>
 
-    <li id="p375">
-      At the bottom of page 375, the text reads:
+    <li id="p408">
+      The attributes list in the middle of page 408 should be:
+      <pre>1  4  0.8
+2  3  1.0
+2  5  3
+2  7  2.5
+2  8  1.3
+2  10 2.2
+3  9  2.3
+5  6  2.8
+6  5  1.2
+6  9  0.3
+7  2  1.1
+8  1  2.6
+9  8  2.1
+10 7  0.9</pre>
+    </li>
+    <li id="p419">
+      On page 419, after the sentence:
       <blockquote>
-        Open the monitors to see how the GoGo extension allows access to the current readings on the dedicated sensor ports. For instance, the reporter:
-
-        <pre><code>
-        gogo:sensor 8
-        </code></pre>
-        reports the...
+        Both “netlogo-users” and “stackoverflow” have many NetLogo experts who are usually very responsive to questions. 
       </blockquote>
-      It should read:
+      we would like to add the additional information:
       <blockquote>
-        Inspect the code for the monitor to see the gogo extension code inside it that allows access to the current readings on the dedicated sensor ports. For instance in the "sensor 8" monitor, there is the code <code>gogo:sensor 8</code>, a reporter that reports the...
+        You may also want to use the Profiler extension that is bundled with NetLogo and can help identify bottlenecks in your code (see the documentation at http://ccl.northwestern.edu/netlogo/docs/profiler.html).
       </blockquote>
     </li>
-
     <li id="p427">
       On pages 427-428, explorations 26 through 30 rely on downloading your Facebook network using a tool called Netvizz. Facebook has recently changed its policies regarding these sorts of tools and has been shutting them down in recent months. Consequently, in order to stay functional, Netvizz has had to remove its ability to download personal networks. You can read more about this on <a href='http://thepoliticsofsystems.net/2015/01/the-end-of-netvizz/'>Netvizz's announcement</a>.
 
