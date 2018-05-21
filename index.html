@@ -8,6 +8,7 @@
 
   <link type="text/css" rel="stylesheet" media="all" href="iabm.css"/>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
   <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
@@ -98,19 +99,33 @@
   window.addEventListener('hashchange', loadContents);
   function loadContents() {
     var page = window.location.hash.substring(1);
-    if (page.indexOf('-') > 0) {
-      var inPageAnchor = page.split('-')[1];
-      page = page.split('-')[0]
-    }
-    page = page + '.html';
-    if (page === '.html') {
+    page += '.html'
+    if (page === '') {
       page = 'home.html';
     }
-    $('#content').load(page, function() {
-      if (inPageAnchor) {
-        var divPosition = $('#' + inPageAnchor).offset();
-        $('html, body').animate({scrollTop: divPosition.top}, "slow");
-      }
+    $('#content').load(page, function () {
+      document.querySelectorAll('script[type="text/markdown"]').forEach(function (script) {
+        let newNode = document.createElement('div');
+        if (script.src !== undefined) {
+          let request = new XMLHttpRequest();
+          request.onreadystatechange = function () {
+            if (request.readyState === XMLHttpRequest.DONE) {
+              if (request.status === 200) {
+                newNode.innerHTML = marked(request.responseText);
+              } else {
+                newNode.textContent = 'Failed to load ' + script.src;
+              }
+              script.replaceWith(newNode);
+            }
+          }
+          request.open('GET', script.src, true);
+          request.overrideMimeType('text/markdown');
+          request.send();
+        } else {
+          newNode.innerHTML = marked(script.textContent);
+          script.replaceWith(newNode);
+        }
+      });
     });
   }
   loadContents();

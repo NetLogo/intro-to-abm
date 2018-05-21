@@ -321,6 +321,10 @@ nav ul li a:hover {
   padding-top: 3px;
 }
 
+#updates li p {
+  margin-top: 0px;
+}
+
 
 #updates .li-blue
 {
