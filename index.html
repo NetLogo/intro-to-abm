@@ -99,10 +99,10 @@
   window.addEventListener('hashchange', loadContents);
   function loadContents() {
     var page = window.location.hash.substring(1);
-    page += '.html'
     if (page === '') {
-      page = 'home.html';
+      page = 'home';
     }
+    page += '.html'
     $('#content').load(page, function () {
       document.querySelectorAll('script[type="text/markdown"]').forEach(function (script) {
         let newNode = document.createElement('div');
