@@ -9,6 +9,11 @@ The smallest number is printing of your copy.
 Errors in later printings should be assumed to be present in earlier printings as well.
 
 ## Fourth printing
+### Chapter 2
+
+  - On page 87, Josh Epstein and Robert Axtell are listed as the authors of the book depicting the Sugarscape model.
+    The authors should be "Joshua M. Epstein and Robert Axtell".
+
 ### Chapter 5
 
 - On page 210, there code says “slow-down-car" with no inputs, should have the input car-ahead
