@@ -271,7 +271,7 @@ nav ul li a:hover {
   background: url('images/download-orange.png');
   background-size: 20px;
   background-repeat: no-repeat;
-  background-position: 0px 0px;
+  background-position: 0px 4px;
   padding-left: 22px;
   padding-top: 5px;
 }
@@ -281,8 +281,24 @@ nav ul li a:hover {
   background: url('images/download.png');
   background-size: 20px;
   background-repeat: no-repeat;
-  background-position: 0px 0px;
+  background-position: 0px 4px;
   padding-top: 5px;
+}
+
+#modelsPage .nlw-link, .nlw-link{
+  font-size:15px;
+  vertical-align: text-bottom;
+  color: #b24926;
+  background: url('images/nlw.png');
+  background-size: 20px;
+  background-repeat: no-repeat;
+  background-position: 0px 6px;
+  padding-left: 22px;
+  padding-top: 5px;
+}
+
+#modelsPage .nlw-link:hover, .nlw-link:hover {
+  color: #333;
 }
 
 #modelsPage .small{
