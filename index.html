@@ -111,7 +111,7 @@
           request.onreadystatechange = function () {
             if (request.readyState === XMLHttpRequest.DONE) {
               if (request.status === 200) {
-                newNode.innerHTML = marked(request.responseText);
+                newNode.innerHTML = marked.parse(request.responseText);
               } else {
                 newNode.textContent = 'Failed to load ' + script.src;
               }
@@ -122,7 +122,7 @@
           request.overrideMimeType('text/markdown');
           request.send();
         } else {
-          newNode.innerHTML = marked(script.textContent);
+          newNode.innerHTML = marked.parse(script.textContent);
           script.replaceWith(newNode);
         }
       });
